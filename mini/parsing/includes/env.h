@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   env.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:27:05 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/01 10:17:21 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/05/13 19:22:24 by mel-mora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ENV_H
 # define ENV_H
 # include "../libft/libft.h"
+# include "minishell.h"
 
 typedef struct s_env
 {
@@ -43,5 +44,7 @@ char	*append_remaining_str(char *value, char *remainder);
 char	*expand_env_in_string(char *str, t_env *env_list, int last_exit_status);
 char	*replace_exit_status(char *str, char *dollar, char *pos, int exit_code);
 char	*replace_env_var(char *str, char *dollar, char *pos, t_env *env_list);
+char    **env_list_to_envp(t_env *env_list);
+void    ft_free_strarr(char **arr);
 #endif
 

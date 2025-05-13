@@ -10,33 +10,33 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../shell.h"
 
-#include "shell.h"
-
-
-
-int builtin_echo(t_cmd *cmd)
+int builtin_echo(char **args)
 {
-    int i = 1;
-    int no_newline = 0;
+    int i;
+    int n_flag;
 
-    if (cmd->args[1] && strcmp(cmd->args[1], "-n") == 0)
-	{
-        no_newline = 1;
+    i = 1;
+    n_flag = 0;
+    if (!args[1])
+    {
+        write(1, "\n", 1);
+        return (0);
+    }
+    if (args[1] && strcmp(args[1], "-n") == 0)
+    {
+        n_flag = 1;
         i = 2;
     }
-    while (cmd->args[i])
-	{
-        printf("%s", cmd->args[i]);
-        if (cmd->args[i + 1])
-		{
-            printf(" ");
-        }
+    while (args[i])
+    {
+        write(1, args[i], ft_strlen(args[i]));
+        if (args[i + 1])
+            write(1, " ", 1);
         i++;
     }
-    if (!no_newline)
-	{
-        printf("\n");
-    }
-    return SUCCESS;
+    if (!n_flag)
+        write(1, "\n", 1);
+    return (0);
 }

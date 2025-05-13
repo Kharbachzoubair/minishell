@@ -10,16 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell.h"
+#include "../shell.h"
 
-int builtin_pwd(t_cmd *cmd)
+int builtin_pwd(void)
 {
-    char cwd[4096];
-    if (getcwd(cwd, sizeof(cwd)) == NULL)
-	{
-        perror("pwd: getcwd");
-        return FAILURE;
+    char buf[PATH_MAX];
+
+    if (!getcwd(buf, sizeof(buf)))
+    {
+        perror("pwd");
+        return (1);
     }
-    printf("%s\n", cwd);
-    return SUCCESS;
+    write(1, buf, ft_strlen(buf));
+    write(1, "\n", 1);
+    return (0);
 }

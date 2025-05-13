@@ -10,32 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell.h"
+#include "../shell.h"
 
+int builtin_cd(char *path, t_env *env_list)
+{
+    char buf[PATH_MAX];
+    char *oldpwd;
 
-int builtin_cd(char *path) {
-    if (!path || strlen(path) == 0) {
-        path = getenv("HOME");
-        if (!path) {
-            fprintf(stderr, "cd: HOME not set\n");
-            return FAILURE;
-        }
-    }
-
-    if (strcmp(path, "-") == 0) {
-        path = getenv("OLDPWD");
-        if (!path) {
-            fprintf(stderr, "cd: OLDPWD not set\n");
-            return FAILURE;
-        }
-        printf("%s\n", path);
-    }
-
-    if (chdir(path) == -1) {
+    if (!path || !*path)
+        path = get_env_value(env_list, "HOME");
+    oldpwd = getcwd(buf, sizeof(buf));
+    if (!oldpwd)
+        return (1);
+    if (chdir(path) == -1)
+    {
         perror("cd");
-        return FAILURE;
+        return (1);
     }
-
-    update_env_vars();
-    return SUCCESS;
+    add_env_var(&env_list, create_env_var("OLDPWD", oldpwd));
+    getcwd(buf, sizeof(buf));
+    add_env_var(&env_list, create_env_var("PWD", buf));
+    return (0);
 }

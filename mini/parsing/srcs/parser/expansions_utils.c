@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansions_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:33:07 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/03 14:51:49 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/05/13 18:39:50 by mel-mora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ t_env *init_env(char **environ)
 
     return env_list;
 }
+
 char *get_env_value(t_env *env_list, char *key)
 {
 	t_env *current;

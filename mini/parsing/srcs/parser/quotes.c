@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   quotes.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:59 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/03 14:17:06 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/05/13 20:56:08 by mel-mora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,6 @@ int process_single_quotes(char *input,
     t_token *tok = create_token(TOKEN_WORD, value, has_space ,1);
     if (tok)
     {
-        printf("[DBG] single-quote → \"%s\", has_space=%d\n",
-               value, has_space);
         add_token(head, tok);
     }
     free(value);
@@ -102,8 +100,6 @@ int process_double_quotes(char *input,int i,t_token **head,int has_space)
     t_token *tok = create_token(TOKEN_WORD, value, has_space , 0);
     if (tok)
     {
-        printf("[DBG] double-quote → \"%s\", has_space=%d\n",
-               value, has_space);
         add_token(head, tok);
     }
     free(value);

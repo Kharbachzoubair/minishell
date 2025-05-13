@@ -10,18 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell.h"
+#include "../shell.h"
 
-int builtin_unset(char *var_name) {
-    if (!var_name || strlen(var_name) == 0) {
-        fprintf(stderr, "unset: missing variable name\n");
-        return FAILURE;
+int builtin_unset(char *key, t_env *env_list)
+{
+    t_env *cur;
+    t_env *prev;
+
+    if (!key || !*key)
+        return (1);
+    cur = env_list;
+    prev = NULL;
+    while (cur)
+    {
+        if (strcmp(cur->key, key) == 0)
+        {
+            if (prev)
+                prev->next = cur->next;
+            else
+                env_list = cur->next;
+            free(cur->key);
+            free(cur->value);
+            free(cur);
+            break;
+        }
+        prev = cur;
+        cur = cur->next;
     }
-
-    if (unsetenv(var_name) == -1) {
-        perror("unset");
-        return FAILURE;
-    }
-
-    return SUCCESS;
+    return (0);
 }

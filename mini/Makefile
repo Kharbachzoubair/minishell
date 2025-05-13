@@ -38,7 +38,8 @@ SRC_FILES = main.c \
 			execution/builtins/unset.c \
 			execution/builtins/cd.c \
 			execution/external/external.c \
-			execution/helpers/helpers.c
+			execution/helpers/helpers.c \
+			execution/execute.c
 
 # Object files
 OBJ_FILES = $(SRC_FILES:.c=.o)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:43 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/06 10:23:37 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/05/13 20:22:23 by mel-mora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,36 +50,34 @@ void	add_command(t_command **head, t_command *new_command)
 
 int add_argument(t_command *cmd, char *arg) {
     char **new_args;
-    int i;
+    int   i;
 
     if (!cmd || !arg)
         return (0);
 
-    // Allocate space for existing args + new arg + NULL terminator (if needed)
-    new_args = malloc(sizeof(char *) * (cmd->arg_count + 1)); // +1 for new arg
+    // +2: one for new arg, one for the NULL terminator
+    new_args = malloc((cmd->arg_count + 2) * sizeof *new_args);
     if (!new_args)
         return (0);
 
-    // Copy existing args
-    i = 0;
-    while (i < cmd->arg_count) {
-        new_args[i] = cmd->args[i]; // Transfer ownership of pointers
-        i++;
-    }
+    // Copy existing pointers
+    for (i = 0; i < cmd->arg_count; i++)
+        new_args[i] = cmd->args[i];
 
-    // Add new argument (duplicate the string)
+    // Duplicate and append the new arg
     new_args[cmd->arg_count] = ft_strdup(arg);
     if (!new_args[cmd->arg_count]) {
-        free(new_args); // Cleanup on strdup failure
+        free(new_args);
         return (0);
     }
 
-    // Free old args array (if it existed)
-    if (cmd->args)
-        free(cmd->args);
+    // NULL-terminate the array
+    new_args[cmd->arg_count + 1] = NULL;
 
-    // Update command structure
-    cmd->args = new_args;
+    // Free old array (but not the strings)
+    free(cmd->args);
+
+    cmd->args      = new_args;
     cmd->arg_count++;
     return (1);
 }

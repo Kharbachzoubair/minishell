@@ -10,14 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "shell.h"
+#include "../includes/env.h"
 
-
-void builtin_env()
+int builtin_env(t_env *env_list)
 {
-    char **env = environ;
-    while (*env) {
-        printf("%s\n", *env);
-        env++;
+    t_env *cur;
+
+    cur = env_list;
+    while (cur)
+    {
+        write(1, cur->key, ft_strlen(cur->key));
+        write(1, "=", 1);
+        write(1, cur->value, ft_strlen(cur->value));
+        write(1, "\n", 1);
+        cur = cur->next;
     }
+    return (0);
 }

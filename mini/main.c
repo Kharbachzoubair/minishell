@@ -3,61 +3,109 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 16:12:16 by absaadan          #+#    #+#             */
-<<<<<<< Updated upstream
-/*   Updated: 2025/05/13 17:32:14 by absaadan         ###   ########.fr       */
-=======
-/*   Updated: 2025/05/13 16:46:06 by zkharbac         ###   ########.fr       */
->>>>>>> Stashed changes
+/*   Updated: 2025/05/13 19:41:06 by mel-mora         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parsing/includes/minishell.h"
-
-void lleak(void)
+#include "execution/shell.h"
+// #include "parsing/includes/minishell.h"
+char    **env_list_to_envp(t_env *env_list)
 {
-    system("leaks minishell");
+    t_env   *cur;
+    int     count;
+    char    **envp;
+    int     i;
+
+    count = 0;
+    cur = env_list;
+    while (cur)
+    {
+        count++;
+        cur = cur->next;
+    }
+    envp = malloc(sizeof(char *) * (count + 1));
+    if (!envp)
+        return (NULL);
+    i = 0;
+    cur = env_list;
+    while (cur)
+    {
+        envp[i] = malloc(strlen(cur->key) + 1 + strlen(cur->value) + 1);
+        if (!envp[i])
+        {
+            /* Free already-allocated strings */
+            while (i-- > 0)
+                free(envp[i]);
+            free(envp);
+            return (NULL);
+        }
+        strcpy(envp[i], cur->key);
+        strcat(envp[i], "=");
+        strcat(envp[i], cur->value);
+        i++;
+        cur = cur->next;
+    }
+    envp[i] = NULL;
+    return (envp);
 }
 
-int g_last_exit_status = 0;
-extern char **environ;
-
-int main(void)
+/*
+** Free a NULL-terminated array of strings
+*/
+void    ft_free_strarr(char **arr)
 {
-	atexit(lleak);
-	char *input;
-	t_token *tokens;
-	t_command *commands;
-	t_env *env_list = init_env(environ);
-	while (1)
-	{
-		input = readline("minishell> ");
-		if (!input)
-			break;
-		if (*input)
-			add_history(input);
+    int i;
 
-		tokens = tokenize(input);
+    if (!arr)
+        return;
+    i = 0;
+    while (arr[i])
+    {
+        free(arr[i]);
+        i++;
+    }
+    free(arr);
+}
 
-		/* Expand environment variables */
-		if (tokens)
-		expand_env_variables_improved(tokens, env_list, g_last_exit_status);
+// static void lleak(void)
+// {
+//     system("leaks minishell");
+// }
 
-		printf("Tokenized input:\n");
-		print_tokens(tokens);
+int main(int ac, char **av, char **envp)
+{
+    char        *input;
+    t_token     *tokens;
+    t_command   *commands;
+    t_env       *env_list;
 
-		commands = parse_tokens(tokens);
-		printf("\nParsed commands:\n");
-		print_commands(commands);
-
-		/* For testing $?, set a different exit status each time */
-		g_last_exit_status = (g_last_exit_status + 1) % 256;
-
-		free_commands(commands);
-		free_tokens(tokens);
-		free(input);
-	}
-	return (0);
+    (void)ac;
+    (void)av;
+    // atexit(lleak);
+    env_list = init_env(envp);
+    set_last_exit_status(0);
+    while (1)
+    {
+        input = readline("minishell> ");
+        if (!input)
+            break;
+        if (*input)
+            add_history(input);
+        tokens = tokenize(input);
+        if (tokens)
+            expand_env_variables_improved(tokens,
+                env_list, get_last_exit_status());
+        // print_tokens(tokens);
+        commands = parse_tokens(tokens);
+        // print_commands(commands);
+        execute_commands(commands, env_list);
+        free_commands(commands);
+        free_tokens(tokens);
+        free(input);
+    }
+    free_env_list(env_list);
+    return (get_last_exit_status());
 }
