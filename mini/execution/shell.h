@@ -24,7 +24,7 @@ int     get_last_exit_status(void);
 void    execute_commands(t_command *cmds, t_env *env_list);
 
 /* Apply redirections to the command */
-void    apply_redirs(t_command *c);
+void apply_redirs(t_command *c, int *saved_stdin, int *saved_stdout);
 
 /* builtin functions */
 int     is_builtin(char *cmd);

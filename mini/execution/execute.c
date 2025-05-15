@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+void restore_stdio(int saved_stdin, int saved_stdout);
 static int  g_last_exit_status;
 
 void    set_last_exit_status(int status)
@@ -50,6 +51,9 @@ int     get_last_exit_status(void)
 
 int  exec_builtin(t_command *c, t_env *env_list)
 {
+    int saved_stdin, saved_stdout;
+
+    apply_redirs(c, &saved_stdin, &saved_stdout);
     if (strcmp(c->name, "echo") == 0)
         return (builtin_echo(c->args));
     if (strcmp(c->name, "cd") == 0)
@@ -62,6 +66,7 @@ int  exec_builtin(t_command *c, t_env *env_list)
         return (builtin_unset(c->args[1], env_list));
     if (strcmp(c->name, "env") == 0)
         return (builtin_env(env_list));
+    restore_stdio(saved_stdin, saved_stdout);
     return (1);
 }
 
@@ -102,29 +107,46 @@ int  exec_builtin(t_command *c, t_env *env_list)
     return (NULL);
 }
 
- void apply_redirs(t_command *c)
+void apply_redirs(t_command *c, int *saved_stdin, int *saved_stdout)
 {
-    t_redirection *r;
-    int             fd;
+    t_redirection *r = c->redirections;
 
-    r = c->redirections;
-    while (r)
+    *saved_stdin=dup(STDIN_FILENO);
+    *saved_stdout=dup(STDOUT_FILENO);
+
+    while(r)
     {
-        if (r->type == TOKEN_REDIR_IN)
-            fd = open(r->file, O_RDONLY);
-        else if (r->type == TOKEN_REDIR_OUT)
-            fd = open(r->file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-        else
-            fd = open(r->file, O_CREAT | O_WRONLY | O_APPEND, 0644);
-        if (fd >= 0)
+        int fd =-1;
+
+        if(r->type == TOKEN_REDIR_IN)
+            fd=open(r->file, O_RDONLY);
+        else if(r->type == TOKEN_REDIR_OUT)
+            fd=open(r->file,O_CREAT | O_WRONLY | O_TRUNC, 0644 );
+        else if(r->type == TOKEN_APPEND)
+            fd=open(r->file, O_CREAT | O_WRONLY | O_APPEND, 0644);
+        
+        if(fd>= 0)
         {
-            if (r->type == TOKEN_REDIR_IN)
+            if(r ->type ==TOKEN_REDIR_IN)
                 dup2(fd, STDIN_FILENO);
             else
                 dup2(fd, STDOUT_FILENO);
-            close(fd);
+            close (fd);
         }
         r = r->next;
+    }
+}
+void restore_stdio(int saved_stdin, int saved_stdout)
+{
+    if (saved_stdin != -1)
+    {
+        dup2(saved_stdin, STDIN_FILENO);
+        close(saved_stdin);
+    }
+    if (saved_stdout != -1)
+    {
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(saved_stdout);
     }
 }
 
@@ -152,12 +174,14 @@ int	check_if_folder(char *cmd)
     int         status;
     char      **envp;
     char        *path;
+    int         saved_stdin;
+    int         saved_stdout;
 
     envp = env_list_to_envp(env_list);
     pid = fork();
     if (pid == 0)
     {
-        apply_redirs(c);
+        apply_redirs(c, &saved_stdin, &saved_stdout);
         if (strchr(c->name, '/'))
             path = c->name;
         else
