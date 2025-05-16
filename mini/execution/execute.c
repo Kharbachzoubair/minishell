@@ -19,6 +19,63 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+char *read_heredoc_content(const char *delimiter) 
+{
+    char buffer[1024];
+    size_t capacity= 1024;
+    size_t size=0;
+    char *content=malloc(capacity);
+    if(!content)
+    {
+        perror("malloc");
+        return NULL;
+    }
+    content[0]='\0';
+    printf("> ");
+    while(fgets(buffer, sizeof(buffer), stdin))
+    {
+        buffer[strcspn(buffer, "\n")]='\0';
+        if(strcmp(buffer, delimiter)==0)
+        {
+            break;
+        }
+        size +=ft_strlen(buffer)+1;
+        if(size>=capacity)
+        {
+            capacity*=2;
+            content=realloc(content, capacity);
+            if(!content)
+            {
+                perror("realloc");
+                return NULL;
+            }
+        }
+        strcat(content,buffer);
+        strcat(content, "\n");
+        printf("> ");
+    }
+    return content;
+
+}
+
+FILE *write_herdroc_to_tmpfile(const char *content)
+{
+    FILE *tmpfile_ptr=tmpfile();
+    if(!tmpfile_ptr)
+    {
+        perror("tmpfile");
+        return (NULL);
+    }
+    size_t bytes_written =fwrite(content, 1, strlen(content), tmpfile_ptr);
+    if(bytes_written!=strlen(content))
+    {
+        perror("fwrite");
+        fclose(tmpfile_ptr);
+        return NULL;
+    }
+    rewind (tmpfile_ptr);
+    return (tmpfile_ptr);
+}
 void restore_stdio(int saved_stdin, int saved_stdout);
 static int  g_last_exit_status;
 
@@ -107,35 +164,64 @@ int  exec_builtin(t_command *c, t_env *env_list)
     return (NULL);
 }
 
-void apply_redirs(t_command *c, int *saved_stdin, int *saved_stdout)
+void apply_redirs(t_command *cmd, int *saved_stdin, int *saved_stdout)
 {
-    t_redirection *r = c->redirections;
+    
+    *saved_stdin = dup(STDIN_FILENO);
+    *saved_stdout = dup(STDOUT_FILENO);
 
-    *saved_stdin=dup(STDIN_FILENO);
-    *saved_stdout=dup(STDOUT_FILENO);
+    t_redirection *r = cmd->redirections;
 
-    while(r)
+    // Apply heredocs
+    int i = 0;
+    while (i < cmd->heredoc_count)
     {
-        int fd =-1;
-
-        if(r->type == TOKEN_REDIR_IN)
-            fd=open(r->file, O_RDONLY);
-        else if(r->type == TOKEN_REDIR_OUT)
-            fd=open(r->file,O_CREAT | O_WRONLY | O_TRUNC, 0644 );
-        else if(r->type == TOKEN_APPEND)
-            fd=open(r->file, O_CREAT | O_WRONLY | O_APPEND, 0644);
-        
-        if(fd>= 0)
+        char *content = read_heredoc_content(cmd->heredoc_delims[i]);
+        if (!content)
         {
-            if(r ->type ==TOKEN_REDIR_IN)
+            fprintf(stderr, "Error reading heredoc content\n");
+            i++;
+            continue;
+        }
+        FILE *tmpfile_ptr = write_herdroc_to_tmpfile(content);
+        free(content);
+        if (!tmpfile_ptr)
+        {
+            fprintf(stderr, "Error writing heredoc to temporary file\n");
+            i++;
+            continue;
+        }
+        int fd = fileno(tmpfile_ptr);
+        if (fd >= 0)
+        {
+            dup2(fd, STDIN_FILENO);
+        }
+        fclose(tmpfile_ptr);
+        i++;
+    }
+    while (r)
+    {
+        int fd = -1;
+
+        if (r->type == TOKEN_REDIR_IN)
+            fd = open(r->file, O_RDONLY);
+        else if (r->type == TOKEN_REDIR_OUT)
+            fd = open(r->file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+        else if (r->type == TOKEN_APPEND)
+            fd = open(r->file, O_CREAT | O_WRONLY | O_APPEND, 0644);
+
+        if (fd >= 0)
+        {
+            if (r->type == TOKEN_REDIR_IN)
                 dup2(fd, STDIN_FILENO);
             else
                 dup2(fd, STDOUT_FILENO);
-            close (fd);
+            close(fd);
         }
         r = r->next;
     }
 }
+
 void restore_stdio(int saved_stdin, int saved_stdout)
 {
     if (saved_stdin != -1)
@@ -177,6 +263,8 @@ int	check_if_folder(char *cmd)
     int         saved_stdin;
     int         saved_stdout;
 
+
+//zoubaaaaaaair
     envp = env_list_to_envp(env_list);
     pid = fork();
     if (pid == 0)
