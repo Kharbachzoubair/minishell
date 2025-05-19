@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:27:05 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/13 19:22:24 by mel-mora         ###   ########.fr       */
+/*   Updated: 2025/05/19 03:26:37 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,7 @@ char	*replace_exit_status(char *str, char *dollar, char *pos, int exit_code);
 char	*replace_env_var(char *str, char *dollar, char *pos, t_env *env_list);
 char    **env_list_to_envp(t_env *env_list);
 void    ft_free_strarr(char **arr);
+t_env *sort_env_list(t_env *env_list);
+t_env *find_env_var(t_env *env_list, const char *key);
 #endif
 

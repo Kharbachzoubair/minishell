@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:43 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/13 20:22:23 by mel-mora         ###   ########.fr       */
+/*   Updated: 2025/05/19 15:50:39 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,28 +94,41 @@ void set_redirection(t_command *cmd, t_token *type_token, t_token *file_token)
     add_redirection(cmd, new_redir);
 
     // For backward compatibility, maintain heredoc array
-    if (type_token->type == TOKEN_HEREDOC)
-    {
-        char **new_list;
-        int i;
+   if (type_token->type == TOKEN_HEREDOC)
+{
+    char **new_list;
+    int i;
 
-        new_list = malloc(sizeof(char *) * (cmd->heredoc_count + 2));
-        if (!new_list)
+    new_list = malloc(sizeof(char *) * (cmd->heredoc_count + 2));
+    if (!new_list)
+        return;
+
+    for (i = 0; i < cmd->heredoc_count; i++) {
+        new_list[i] = strdup(cmd->heredoc_delims[i]);
+        if (!new_list[i]) {
+            // Clean up on failure
+            while (--i >= 0)
+                free(new_list[i]);
+            free(new_list);
             return;
-		printf("heredoc count: %d\n", cmd->heredoc_count);
-        for (i = 0; i < cmd->heredoc_count; i++)
-		{
-            new_list[i] = cmd->heredoc_delims[i];
-			printf("heredoc: %s\n", new_list[i]);
-		}
-
-        new_list[cmd->heredoc_count] = strdup(file_token->value);
-        new_list[cmd->heredoc_count + 1] = NULL;
-
-        free(cmd->heredoc_delims);
-        cmd->heredoc_delims = new_list;
-        cmd->heredoc_count++;
+        }
     }
+
+    new_list[cmd->heredoc_count] = strdup(file_token->value);
+    if (!new_list[cmd->heredoc_count]) {
+        for (i = 0; i < cmd->heredoc_count; i++)
+            free(new_list[i]);
+        free(new_list);
+        return;
+    }
+
+    new_list[cmd->heredoc_count + 1] = NULL;
+
+    free(cmd->heredoc_delims);  // only free the array, not the strings inside
+    cmd->heredoc_delims = new_list;
+    cmd->heredoc_count++;
+    }
+
 }
 
 
@@ -225,6 +238,7 @@ int update_command_arg(t_command *cmd, int arg_index, char *new_value)
 
     return 1;
 }
+
 t_command *parse_tokens(t_token *tokens)
 {
     t_command *head    = NULL;
@@ -234,50 +248,81 @@ t_command *parse_tokens(t_token *tokens)
     while (tok)
     {
         if (tok->type == TOKEN_WORD)
-{
-    if (!current)
-        current = create_command();
+        {
+            if (!current)
+                current = create_command();
 
-   if (tok->has_space == 0 && current->arg_count > 0)
-{
-    // Get index of the last argument
-    int last_arg_index = current->arg_count - 1;
-
-    // Merge with previous argument
-    char *merged = merge_token_values(current->args[last_arg_index], tok->value);
-    if (!merged) {
-        fprintf(stderr, "minishell: memory allocation error during token merging\n");
-        free_commands(head);
-        return NULL;
-    }
-
-    // Update the argument in the command
-    if (!update_command_arg(current, last_arg_index, merged)) {
-        fprintf(stderr, "minishell: failed to update argument during token merging\n");
-        free(merged);
-        free_commands(head);
-        return NULL;
-    }
-
-    free(merged);
-}
-    else
-    {
-        // First word becomes name
-        add_argument(current, tok->value);
-        if (current->arg_count == 1)
-            current->name = strdup(tok->value);
-    }
-}
+            if (tok->has_space == 0 && current->arg_count > 0)
+            {
+                int last_arg_index = current->arg_count - 1;
+                char *merged = merge_token_values(current->args[last_arg_index], tok->value);
+                if (!merged)
+                {
+                    fprintf(stderr, "minishell: memory allocation error during token merging\n");
+                    free_commands(head);
+                    return NULL;
+                }
+                if (!update_command_arg(current, last_arg_index, merged))
+                {
+                    fprintf(stderr, "minishell: failed to update argument during token merging\n");
+                    free(merged);
+                    free_commands(head);
+                    return NULL;
+                }
+                free(merged);
+            }
+            else
+            {
+                add_argument(current, tok->value);
+                if (current->arg_count == 1)
+                    current->name = strdup(tok->value);
+            }
+        }
         else if (tok->type == TOKEN_PIPE)
         {
-            if (current)
-                add_command(&head, current);
+            if (!current || !tok->next || tok->next->type == TOKEN_PIPE)
+            {
+                fprintf(stderr, "minishell: syntax error near unexpected token `|`\n");
+                free_commands(head);
+                return NULL;
+            }
+            add_command(&head, current);
             current = NULL;
         }
-        else if (tok->type == TOKEN_REDIR_IN
-              || tok->type == TOKEN_REDIR_OUT
-              || tok->type == TOKEN_APPEND)
+        else if (tok->type == TOKEN_REDIR_IN || tok->type == TOKEN_REDIR_OUT || tok->type == TOKEN_APPEND)
+        {
+            if (!current)
+                current = create_command();
+
+            t_redirection *redir = current->redirections;
+            while (redir)
+            {
+                if ((redir->type == TOKEN_REDIR_IN && tok->type == TOKEN_REDIR_IN) ||
+                    (redir->type == TOKEN_REDIR_OUT && tok->type == TOKEN_REDIR_OUT) ||
+                    (redir->type == TOKEN_APPEND && tok->type == TOKEN_APPEND))
+                {
+                    fprintf(stderr, "minishell: ambiguous redirect\n");
+                    free_commands(head);
+                    return NULL;
+                }
+                redir = redir->next;
+            }
+
+            if (tok->next && tok->next->type == TOKEN_WORD)
+            {
+                set_redirection(current, tok, tok->next);
+                tok = tok->next;
+            }
+            else
+            {
+                fprintf(stderr, "minishell: syntax error near unexpected token `%s`\n",
+                        tok->type == TOKEN_APPEND ? ">>" :
+                        tok->type == TOKEN_REDIR_IN ? "<" : ">");
+                free_commands(head);
+                return NULL;
+            }
+        }
+        else if (tok->type == TOKEN_HEREDOC)
         {
             if (!current)
                 current = create_command();
@@ -288,32 +333,11 @@ t_command *parse_tokens(t_token *tokens)
             }
             else
             {
-                fprintf(stderr,
-                    "minishell: syntax error near unexpected token `%s`\n",
-                    tok->type == TOKEN_APPEND ? ">>" :
-                    tok->type == TOKEN_REDIR_IN ? "<" : ">");
+                fprintf(stderr, "minishell: syntax error: missing heredoc delimiter\n");
                 free_commands(head);
                 return NULL;
             }
         }
-       else if (tok->type == TOKEN_HEREDOC)
-{
-    if (!current)
-        current = create_command();
-    if (tok->next && tok->next->type == TOKEN_WORD)
-    {
-        // Call set_redirection instead of push_heredoc_delim
-        set_redirection(current, tok, tok->next);
-        tok = tok->next;
-    }
-    else
-    {
-        fprintf(stderr,
-            "minishell: syntax error: no heredoc delimiter\n");
-        free_commands(head);
-        return NULL;
-    }
-}
         tok = tok->next;
     }
 
@@ -324,8 +348,6 @@ t_command *parse_tokens(t_token *tokens)
 
     return head;
 }
-
-
 
 void print_commands(t_command *head)
 {

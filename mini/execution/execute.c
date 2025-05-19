@@ -1,14 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   execute.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/26 13:35:07 by marvin            #+#    #+#             */
-/*   Updated: 2025/04/26 13:35:07 by marvin           ###   ########.fr       */
+/*   Created: 2025/05/19 18:04:50 by zkharbac          #+#    #+#             */
+/*   Updated: 2025/05/19 18:04:50 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
 
 #include "shell.h"
 #include <fcntl.h>
@@ -19,43 +21,51 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-char *read_heredoc_content(const char *delimiter) 
+char *read_heredoc_content(const char *delimiter)
 {
     char buffer[1024];
-    size_t capacity= 1024;
-    size_t size=0;
-    char *content=malloc(capacity);
-    if(!content)
+    size_t capacity = 2048;
+    size_t length = 0;
+    char *content = malloc(capacity);
+
+    if (!content)
+        return (perror("malloc"), NULL);
+    
+    content[0] = '\0';
+
+    while (1)
     {
-        perror("malloc");
-        return NULL;
-    }
-    content[0]='\0';
-    printf("> ");
-    while(fgets(buffer, sizeof(buffer), stdin))
-    {
-        buffer[strcspn(buffer, "\n")]='\0';
-        if(strcmp(buffer, delimiter)==0)
+        printf("> ");
+        if (!fgets(buffer, sizeof(buffer), stdin)) // Ctrl+D
         {
+            printf("warning: heredoc delimited by end-of-file (wanted `%s`)\n", delimiter);
             break;
         }
-        size +=ft_strlen(buffer)+1;
-        if(size>=capacity)
-        {
-            capacity*=2;
-            content=realloc(content, capacity);
-            if(!content)
-            {
-                perror("realloc");
-                return NULL;
-            }
-        }
-        strcat(content,buffer);
-        strcat(content, "\n");
-        printf("> ");
-    }
-    return content;
 
+        buffer[strcspn(buffer, "\n")] = '\0'; // remove newline
+
+        if (strcmp(buffer, delimiter) == 0)
+            break;
+
+        size_t line_len = strlen(buffer) + 1; // +1 for '\n'
+        if (length + line_len + 1 >= capacity) // +1 for final '\0'
+        {
+            capacity *= 2;
+            char *new_content = realloc(content, capacity);
+            if (!new_content)
+            {
+                free(content);
+                return (perror("realloc"), NULL);
+            }
+            content = new_content;
+        }
+
+        strcat(content, buffer);
+        strcat(content, "\n");
+        length += line_len;
+    }
+
+    return content;
 }
 
 FILE *write_herdroc_to_tmpfile(const char *content)
@@ -105,26 +115,28 @@ int     get_last_exit_status(void)
         return (1);
     return (0);
 }
-
-int  exec_builtin(t_command *c, t_env *env_list)
+int exec_builtin(t_command *c, t_env *env_list)
 {
+    int exit_code = 1;
     int saved_stdin, saved_stdout;
 
     apply_redirs(c, &saved_stdin, &saved_stdout);
+
     if (strcmp(c->name, "echo") == 0)
-        return (builtin_echo(c->args));
-    if (strcmp(c->name, "cd") == 0)
-        return (builtin_cd(c->args[1], env_list));
-    if (strcmp(c->name, "pwd") == 0)
-        return (builtin_pwd());
-    if (strcmp(c->name, "export") == 0)
-        return (builtin_export(c->args[1], env_list));
-    if (strcmp(c->name, "unset") == 0)
-        return (builtin_unset(c->args[1], env_list));
-    if (strcmp(c->name, "env") == 0)
-        return (builtin_env(env_list));
+        exit_code = builtin_echo(c->args);
+    else if (strcmp(c->name, "cd") == 0)
+        exit_code = builtin_cd(c->args[1], env_list);
+    else if (strcmp(c->name, "pwd") == 0)
+        exit_code = builtin_pwd();
+    else if (strcmp(c->name, "export") == 0)
+        exit_code = builtin_export(c->args[1], env_list);
+    else if (strcmp(c->name, "unset") == 0)
+        exit_code = builtin_unset(c->args[1], env_list);
+    else if (strcmp(c->name, "env") == 0)
+        exit_code = builtin_env(env_list);
+
     restore_stdio(saved_stdin, saved_stdout);
-    return (1);
+    return (exit_code);
 }
 
 
@@ -295,17 +307,85 @@ int	check_if_folder(char *cmd)
     return (1);
 }
 
-void    execute_commands(t_command *cmds, t_env *env_list)
+void execute_commands(t_command *cmds, t_env *env_list)
 {
+    int pipefd[2];
+    int prev_fd = -1;
+    pid_t pid;
     int status;
 
     while (cmds)
     {
-        if (is_builtin(cmds->name))
-            status = exec_builtin(cmds, env_list);
-        else
-            status = exec_node(cmds, env_list);
-        set_last_exit_status(status);
+        int is_last = (cmds->next == NULL);
+
+        if (!is_last)
+            pipe(pipefd);
+
+        // Run built-in without fork if it is the only command and no pipe
+        if (is_builtin(cmds->name) && is_last && prev_fd == -1)
+        {
+            int saved_stdin, saved_stdout;
+            apply_redirs(cmds, &saved_stdin, &saved_stdout);
+            int exit_status = exec_builtin(cmds, env_list);
+            restore_stdio(saved_stdin, saved_stdout);
+            set_last_exit_status(exit_status);
+            return;
+        }
+
+        pid = fork();
+        if (pid == 0)
+        {
+            int saved_stdin, saved_stdout;
+            apply_redirs(cmds, &saved_stdin, &saved_stdout);
+
+            if (prev_fd != -1)
+            {
+                dup2(prev_fd, STDIN_FILENO);
+                close(prev_fd);
+            }
+
+            if (!is_last)
+            {
+                dup2(pipefd[1], STDOUT_FILENO);
+                close(pipefd[0]);
+                close(pipefd[1]);
+            }
+
+            if (is_builtin(cmds->name))
+                exit(exec_builtin(cmds, env_list));
+
+            char *path = strchr(cmds->name, '/') ? cmds->name : find_executable(cmds->name, env_list);
+            if (!path)
+            {
+                fprintf(stderr, "%s: command not found\n", cmds->name);
+                exit(127);
+            }
+
+            if (check_if_folder(path))
+                exit(126);
+
+            char **envp = env_list_to_envp(env_list);
+            execve(path, cmds->args, envp);
+            perror(path);
+            ft_free_strarr(envp);
+            if (path != cmds->name)
+                free(path);
+            exit(1);
+        }
+
+        // Parent
+        if (prev_fd != -1)
+            close(prev_fd);
+        if (!is_last)
+        {
+            close(pipefd[1]);
+            prev_fd = pipefd[0];
+        }
+
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+            set_last_exit_status(WEXITSTATUS(status));
+
         cmds = cmds->next;
     }
 }

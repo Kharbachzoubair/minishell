@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:20 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/13 18:57:24 by mel-mora         ###   ########.fr       */
+/*   Updated: 2025/05/19 01:10:55 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,6 @@
 #include <readline/history.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/stat.h>
 
 #endif
