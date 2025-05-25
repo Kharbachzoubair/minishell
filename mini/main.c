@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "execution/shell.h"
-// #include "parsing/includes/minishell.h"
+#include "parsing/includes/minishell.h"
 char    **env_list_to_envp(t_env *env_list)
 {
     t_env   *cur;
