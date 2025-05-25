@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
 #include "shell.h"
 #include <fcntl.h>
 #include <sys/wait.h>
@@ -21,71 +19,15 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-char *read_heredoc_content(const char *delimiter)
-{
-    char buffer[1024];
-    size_t capacity = 2048;
-    size_t length = 0;
-    char *content = malloc(capacity);
 
-    if (!content)
-        return (perror("malloc"), NULL);
-    
-    content[0] = '\0';
+// Process all heredocs for a command (call this after parsing, before execution)
 
-    while (1)
-    {
-        printf("> ");
-        if (!fgets(buffer, sizeof(buffer), stdin)) // Ctrl+D
-        {
-            printf("warning: heredoc delimited by end-of-file (wanted `%s`)\n", delimiter);
-            break;
-        }
 
-        buffer[strcspn(buffer, "\n")] = '\0'; // remove newline
+// Read heredoc content and create temp file
 
-        if (strcmp(buffer, delimiter) == 0)
-            break;
 
-        size_t line_len = strlen(buffer) + 1; // +1 for '\n'
-        if (length + line_len + 1 >= capacity) // +1 for final '\0'
-        {
-            capacity *= 2;
-            char *new_content = realloc(content, capacity);
-            if (!new_content)
-            {
-                free(content);
-                return (perror("realloc"), NULL);
-            }
-            content = new_content;
-        }
 
-        strcat(content, buffer);
-        strcat(content, "\n");
-        length += line_len;
-    }
 
-    return content;
-}
-
-FILE *write_herdroc_to_tmpfile(const char *content)
-{
-    FILE *tmpfile_ptr=tmpfile();
-    if(!tmpfile_ptr)
-    {
-        perror("tmpfile");
-        return (NULL);
-    }
-    size_t bytes_written =fwrite(content, 1, strlen(content), tmpfile_ptr);
-    if(bytes_written!=strlen(content))
-    {
-        perror("fwrite");
-        fclose(tmpfile_ptr);
-        return NULL;
-    }
-    rewind (tmpfile_ptr);
-    return (tmpfile_ptr);
-}
 void restore_stdio(int saved_stdin, int saved_stdout);
 static int  g_last_exit_status;
 
@@ -178,39 +120,19 @@ int exec_builtin(t_command *c, t_env *env_list)
 
 void apply_redirs(t_command *cmd, int *saved_stdin, int *saved_stdout)
 {
-    
     *saved_stdin = dup(STDIN_FILENO);
     *saved_stdout = dup(STDOUT_FILENO);
 
-    t_redirection *r = cmd->redirections;
-
-    // Apply heredocs
-    int i = 0;
-    while (i < cmd->heredoc_count)
+    // Apply heredocs FIRST - use the LAST one as stdin (bash behavior)
+    if (cmd->heredoc_count > 0)
     {
-        char *content = read_heredoc_content(cmd->heredoc_delims[i]);
-        if (!content)
-        {
-            fprintf(stderr, "Error reading heredoc content\n");
-            i++;
-            continue;
-        }
-        FILE *tmpfile_ptr = write_herdroc_to_tmpfile(content);
-        free(content);
-        if (!tmpfile_ptr)
-        {
-            fprintf(stderr, "Error writing heredoc to temporary file\n");
-            i++;
-            continue;
-        }
-        int fd = fileno(tmpfile_ptr);
-        if (fd >= 0)
-        {
-            dup2(fd, STDIN_FILENO);
-        }
-        fclose(tmpfile_ptr);
-        i++;
+        int last_heredoc_fd = cmd->heredoc_fds[cmd->heredoc_count - 1];
+        if (last_heredoc_fd >= 0)
+            dup2(last_heredoc_fd, STDIN_FILENO);
     }
+
+    // Then apply other redirections (can override heredoc)
+    t_redirection *r = cmd->redirections;
     while (r)
     {
         int fd = -1;

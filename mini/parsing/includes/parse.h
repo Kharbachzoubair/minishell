@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
+/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:24 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/18 19:22:59 by zkharbac         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:34:44 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,12 @@
 #include "minishell.h"
 /* Command structure */
 #include "redirection.h"
+#define MAX_HEREDOCS 16
 typedef struct s_redirection
 {
     t_token_type	type;          // Use your existing token type enum
-    char *file;                 // Filename or heredoc delimiter
+    char *file;	// Filename or heredoc delimiter
+	// int fd;
     struct s_redirection *next; // Next redirection in list
 } t_redirection;
 
@@ -33,6 +35,7 @@ typedef struct s_command
     int             append_mode;     /* 1 if >> is used, 0 otherwise */
     char           **heredoc_delims;  /* Array of heredoc delimiters */
     int                 heredoc_count;
+	int heredoc_fds[MAX_HEREDOCS];
 	t_redirection *redirections;
     int             type;
     struct s_command *next;          /* Next command in pipeline */

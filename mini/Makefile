@@ -20,6 +20,7 @@ READLINE_FLAGS = -lreadline
 
 # Source files - adjust these paths to match your actual file structure
 SRC_FILES = main.c \
+			heredoc.c \
 			parsing/srcs/lexer/tokenizer.c \
 			parsing/srcs/lexer/token_utils.c \
 			parsing/srcs/lexer/lexer_utils.c \

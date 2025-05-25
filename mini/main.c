@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
+/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 16:12:16 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/19 00:50:14 by zkharbac         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:26:56 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "execution/shell.h"
+
 // #include "parsing/includes/minishell.h"
 char    **env_list_to_envp(t_env *env_list)
 {
@@ -84,7 +85,6 @@ int main(int ac, char **av, char **envp)
 
     (void)ac;
     (void)av;
-    // atexit(lleak);
     env_list = init_env(envp);
     set_last_exit_status(0);
     while (1)
@@ -98,9 +98,18 @@ int main(int ac, char **av, char **envp)
         if (tokens)
             expand_env_variables_improved(tokens,
                 env_list, get_last_exit_status());
-        // print_tokens(tokens);
         commands = parse_tokens(tokens);
-        // print_commands(commands);
+
+        // ADD THIS RIGHT HERE - after parsing, before execution
+        if (commands && process_command_heredocs(commands) == -1)
+        {
+            // Heredoc processing failed (probably EOF hit)
+            free_commands(commands);
+            free_tokens(tokens);
+            free(input);
+            continue; // Skip execution and go to next prompt
+        }
+
         execute_commands(commands, env_list);
         free_commands(commands);
         free_tokens(tokens);
