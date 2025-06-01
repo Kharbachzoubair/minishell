@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
+/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:43 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/19 15:50:39 by zkharbac         ###   ########.fr       */
+/*   Updated: 2025/06/01 11:33:31 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,8 +341,16 @@ t_command *parse_tokens(t_token *tokens)
         tok = tok->next;
     }
 
-    if (current && (current->name || current->heredoc_count > 0))
-        add_command(&head, current);
+   if (current && (current->name || current->heredoc_count > 0))
+{
+    // If we have heredocs but no command, create a dummy command like "cat"
+    if (!current->name && current->heredoc_count > 0)
+    {
+        current->name = strdup("cat");
+        add_argument(current, "cat");
+    }
+    add_command(&head, current);
+}
     else
         free(current);
 

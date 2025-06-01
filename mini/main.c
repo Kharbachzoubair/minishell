@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 16:12:16 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/25 12:26:56 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/01 10:41:34 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int main(int ac, char **av, char **envp)
         commands = parse_tokens(tokens);
 
         // ADD THIS RIGHT HERE - after parsing, before execution
-        if (commands && process_command_heredocs(commands) == -1)
+        if (commands && process_command_heredocs(commands, env_list) == -1)
         {
             // Heredoc processing failed (probably EOF hit)
             free_commands(commands);

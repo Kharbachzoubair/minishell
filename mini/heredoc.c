@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 15:00:00 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/25 12:32:10 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/01 11:30:17 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ int create_heredoc_tmpfile(const char *content)
     return (fd);
 }
 
-// Your WORKING heredoc reader - adapted from your original code
-char *read_heredoc_content_working(const char *delimiter)
+// Updated heredoc reader with environment variable expansion
+char *read_heredoc_content_working(const char *delimiter, t_env *env_list)
 {
     char buffer[1024];
     size_t capacity = 2048;
@@ -48,9 +48,8 @@ char *read_heredoc_content_working(const char *delimiter)
     content[0] = '\0';
 
     while (1)
-    {
-        printf("> ");           // Your working prompt
-        fflush(stdout);         // Make sure it shows
+    {       // Your working prompt
+        write(STDOUT_FILENO, "> ", 2);        // Make sure it shows
 
         if (!fgets(buffer, sizeof(buffer), stdin)) // Your working input method
         {
@@ -64,30 +63,38 @@ char *read_heredoc_content_working(const char *delimiter)
         if (strcmp(buffer, delimiter) == 0)   // Your working comparison
             break;
 
-        // Your working append logic
-        size_t line_len = strlen(buffer) + 1; // +1 for '\n'
+        // NEW: Expand environment variables in the line
+        char *expanded_line = expand_env_in_string(buffer, env_list, get_last_exit_status());
+        if (!expanded_line)
+            expanded_line = strdup(buffer); // Fallback to original if expansion fails
+
+        // Your working append logic (but use expanded_line instead of buffer)
+        size_t line_len = strlen(expanded_line) + 1; // +1 for '\n'
         if (length + line_len + 1 >= capacity)
         {
             capacity *= 2;
             char *new_content = realloc(content, capacity);
             if (!new_content)
             {
+                free(expanded_line);
                 free(content);
                 return (NULL);
             }
             content = new_content;
         }
 
-        strcat(content, buffer);
+        strcat(content, expanded_line);
         strcat(content, "\n");
         length += line_len;
+
+        free(expanded_line); // Clean up the expanded line
     }
 
     return content;
 }
 
-// Process all heredocs for a command (call this after parsing, before execution)
-int process_command_heredocs(t_command *cmd)
+// Updated process function to accept env_list parameter
+int process_command_heredocs(t_command *cmd, t_env *env_list)
 {
     int i = 0;
 
@@ -97,7 +104,7 @@ int process_command_heredocs(t_command *cmd)
     // Process each heredoc in order
     while (i < cmd->heredoc_count)
     {
-        char *content = read_heredoc_content_working(cmd->heredoc_delims[i]);
+        char *content = read_heredoc_content_working(cmd->heredoc_delims[i], env_list);
         if (!content)
             return (-1); // EOF hit, abort command
 

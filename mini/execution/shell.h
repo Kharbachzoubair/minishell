@@ -36,8 +36,10 @@ int     builtin_export(char *var, t_env *env_list);
 int     builtin_unset(char *var, t_env *env_list);
 int     builtin_env(t_env *env_list);
 int read_and_create_heredoc(char *delimiter);
-int process_command_heredocs(t_command *cmd);
-char *read_heredoc_content_working(const char *delimiter);
+int process_command_heredocs(t_command *cmd, t_env *env_list);
+
+char *read_heredoc_content_working(const char *delimiter, t_env *env_list);
+
 
 
 
