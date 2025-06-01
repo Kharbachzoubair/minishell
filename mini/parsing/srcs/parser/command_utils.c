@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:43 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/01 11:33:31 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/01 11:34:20 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -343,7 +343,7 @@ t_command *parse_tokens(t_token *tokens)
 
    if (current && (current->name || current->heredoc_count > 0))
 {
-    // If we have heredocs but no command, create a dummy command like "cat"
+
     if (!current->name && current->heredoc_count > 0)
     {
         current->name = strdup("cat");
