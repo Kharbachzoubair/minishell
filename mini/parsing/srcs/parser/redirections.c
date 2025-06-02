@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:40:02 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/25 12:35:01 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/02 13:51:46 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ t_redirection *create_redirection(t_token_type type, char *file)
         free(redir);
         return NULL;
     }
-
+	
     redir->next = NULL;
     return redir;
 }

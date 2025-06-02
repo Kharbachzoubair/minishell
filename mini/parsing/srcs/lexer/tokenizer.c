@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:39 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/06 12:56:00 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/02 12:01:27 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ int	handle_word(char *input, int i, t_token **head, int has_space)
 
 static int	process_whitespace( int i)
 {
-
 	return (i + 1);
 }
 

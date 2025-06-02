@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 16:12:16 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/01 10:41:34 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/02 12:29:50 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,14 @@ void    ft_free_strarr(char **arr)
     free(arr);
 }
 
-// static void lleak(void)
-// {
-//     system("leaks minishell");
-// }
+static void lleak(void)
+{
+    system("leaks minishell");
+}
 
 int main(int ac, char **av, char **envp)
 {
+	atexit(lleak);
     char        *input;
     t_token     *tokens;
     t_command   *commands;

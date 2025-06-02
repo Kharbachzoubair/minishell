@@ -6,13 +6,13 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 15:00:00 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/01 11:30:17 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/02 12:09:09 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-// Create temporary file with heredoc content
+
 int create_heredoc_tmpfile(const char *content)
 {
     int fd;
@@ -22,7 +22,7 @@ int create_heredoc_tmpfile(const char *content)
     if (fd == -1)
         return (-1);
 
-    unlink(template); // Auto-cleanup when fd closed
+    unlink(template);
 
     if (write(fd, content, strlen(content)) == -1)
     {
@@ -30,11 +30,10 @@ int create_heredoc_tmpfile(const char *content)
         return (-1);
     }
 
-    lseek(fd, 0, SEEK_SET); // Reset to beginning for reading
+    lseek(fd, 0, SEEK_SET); 
     return (fd);
 }
 
-// Updated heredoc reader with environment variable expansion
 char *read_heredoc_content_working(const char *delimiter, t_env *env_list)
 {
     char buffer[1024];
@@ -48,28 +47,27 @@ char *read_heredoc_content_working(const char *delimiter, t_env *env_list)
     content[0] = '\0';
 
     while (1)
-    {       // Your working prompt
-        write(STDOUT_FILENO, "> ", 2);        // Make sure it shows
+    {
+        write(STDOUT_FILENO, "> ", 2);
 
-        if (!fgets(buffer, sizeof(buffer), stdin)) // Your working input method
+        if (!fgets(buffer, sizeof(buffer), stdin))
         {
             printf("warning: heredoc delimited by end-of-file (wanted `%s`)\n", delimiter);
             free(content);
             return (NULL);
         }
 
-        buffer[strcspn(buffer, "\n")] = '\0'; // remove newline - your working method
+        buffer[strcspn(buffer, "\n")] = '\0';
 
-        if (strcmp(buffer, delimiter) == 0)   // Your working comparison
+        if (strcmp(buffer, delimiter) == 0)
             break;
 
-        // NEW: Expand environment variables in the line
+
         char *expanded_line = expand_env_in_string(buffer, env_list, get_last_exit_status());
         if (!expanded_line)
-            expanded_line = strdup(buffer); // Fallback to original if expansion fails
+            expanded_line = strdup(buffer);
 
-        // Your working append logic (but use expanded_line instead of buffer)
-        size_t line_len = strlen(expanded_line) + 1; // +1 for '\n'
+        size_t line_len = strlen(expanded_line) + 1;
         if (length + line_len + 1 >= capacity)
         {
             capacity *= 2;
@@ -87,13 +85,13 @@ char *read_heredoc_content_working(const char *delimiter, t_env *env_list)
         strcat(content, "\n");
         length += line_len;
 
-        free(expanded_line); // Clean up the expanded line
+        free(expanded_line);
     }
 
     return content;
 }
 
-// Updated process function to accept env_list parameter
+
 int process_command_heredocs(t_command *cmd, t_env *env_list)
 {
     int i = 0;
@@ -101,14 +99,14 @@ int process_command_heredocs(t_command *cmd, t_env *env_list)
     if (!cmd || cmd->heredoc_count == 0)
         return (0);
 
-    // Process each heredoc in order
+
     while (i < cmd->heredoc_count)
     {
         char *content = read_heredoc_content_working(cmd->heredoc_delims[i], env_list);
         if (!content)
-            return (-1); // EOF hit, abort command
+            return (-1);
 
-        // Create temp file for this heredoc
+
         cmd->heredoc_fds[i] = create_heredoc_tmpfile(content);
         free(content);
 

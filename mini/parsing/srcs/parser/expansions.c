@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:53 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/05 11:56:18 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/02 12:07:22 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,35 +29,6 @@ char *safe_strdup(const char *str)
     if (!str)
         return strdup("");
     return strdup(str);
-}
-
-/* Expand environment variables in a token list */
-#include <string.h>  // for strchr
-
-void expand_env_variables(t_token *tokens, t_env *env_list, int last_exit_status)
-{
-    t_token *current = tokens;
-    char    *expanded;
-
-    while (current)
-    {
-        // Debug the token and its no_expand flag
-        printf("[DEBUG] Processing token: %s, no_expand=%d\n",
-               current->value, current->no_expand);
-
-        // Only expand if it's a word token, has a value, contains '$', and isn't no_expand
-        if (current->type == TOKEN_WORD && current->value &&
-            !current->no_expand && strchr(current->value, '$'))
-        {
-            expanded = expand_env_in_string(current->value, env_list, last_exit_status);
-            if (expanded)
-            {
-                free(current->value);
-                current->value = expanded;
-            }
-        }
-        current = current->next;
-    }
 }
 
 
@@ -115,10 +86,8 @@ char *expand_env_in_string(char *str, t_env *env_list, int last_exit_status)
 
     while ((dollar = ft_strchr(pos, '$')) != NULL)
     {
-        // 1) record where the '$' was
         offset = dollar - result;
 
-        // 2) decide which replacement and its length
         if (dollar[1] == '?')
         {
             char *exit_str = ft_itoa(last_exit_status);
@@ -126,14 +95,14 @@ char *expand_env_in_string(char *str, t_env *env_list, int last_exit_status)
             result = replace_substring_2(
                 result,
                 offset,
-                offset + 2,    // skip over "$?"
+                offset + 2,
                 exit_str
             );
             free(exit_str);
         }
         else
         {
-            // find end of var name
+
             char *p = dollar + 1;
             while (*p && (isalnum(*p) || *p == '_'))
                 p++;
@@ -146,7 +115,7 @@ char *expand_env_in_string(char *str, t_env *env_list, int last_exit_status)
             result = replace_substring_2(
                 result,
                 offset,
-                offset + 1 + var_len,  // skip "$" + var name
+                offset + 1 + var_len,
                 val
             );
             free(val);
@@ -155,7 +124,6 @@ char *expand_env_in_string(char *str, t_env *env_list, int last_exit_status)
         if (!result)
             return NULL;
 
-        // 3) advance pos in the new buffer
         pos = result + offset + insert_len;
     }
 

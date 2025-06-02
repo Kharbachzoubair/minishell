@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansions_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-mora <mel-mora@student.42.fr>          +#+  +:+       +#+        */
+/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:33:07 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/13 18:39:50 by mel-mora         ###   ########.fr       */
+/*   Updated: 2025/06/02 12:12:26 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,13 @@ char *get_env_value(t_env *env_list, char *key)
 void expand_env_variables_improved(t_token *tokens, t_env *env_list, int last_exit_status)
 {
     t_token *current = tokens;
+    t_token *prev = NULL;
 
     while (current)
     {
-		//   printf("[DEBUG] Processing token: %s, no_expand=%d\n",
-        //        current->value, current->no_expand);
-        // Only expand if it's a word token, has a value, and isn't marked as no_expand
-        if (current->type == TOKEN_WORD && current->value && !current->no_expand)
+        // Skip expansion if this token is a heredoc delimiter
+        if (current->type == TOKEN_WORD && current->value && !current->no_expand
+            && !(prev && prev->type == TOKEN_HEREDOC))  // ← NEW: Skip if prev was heredoc
         {
             char *expanded = expand_env_in_string(current->value, env_list, last_exit_status);
             if (expanded)
@@ -152,6 +152,8 @@ void expand_env_variables_improved(t_token *tokens, t_env *env_list, int last_ex
                 current->value = expanded;
             }
         }
+
+        prev = current;  // ← NEW: Track previous token
         current = current->next;
     }
 }
