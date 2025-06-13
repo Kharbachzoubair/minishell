@@ -1,0 +1,3 @@
+*.o
+parsing/objs/
+*.txt
