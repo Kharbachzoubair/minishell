@@ -27,7 +27,6 @@
 
 
 
-
 void restore_stdio(int saved_stdin, int saved_stdout);
 static int  g_last_exit_status;
 
@@ -55,6 +54,8 @@ int     get_last_exit_status(void)
         return (1);
     if (strcmp(cmd, "env") == 0)
         return (1);
+    if (strcmp(cmd, "exit") == 0)
+        return (1);
     return (0);
 }
 int exec_builtin(t_command *c, t_env *env_list)
@@ -71,11 +72,19 @@ int exec_builtin(t_command *c, t_env *env_list)
     else if (strcmp(c->name, "pwd") == 0)
         exit_code = builtin_pwd();
     else if (strcmp(c->name, "export") == 0)
-        exit_code = builtin_export(c->args[1], env_list);
+        exit_code = builtin_export(c->args[1], &env_list);
     else if (strcmp(c->name, "unset") == 0)
         exit_code = builtin_unset(c->args[1], env_list);
     else if (strcmp(c->name, "env") == 0)
         exit_code = builtin_env(env_list);
+    else if (strcmp(c->name, "exit") == 0)
+    {
+    int result = builtin_exit(c->args);
+    if (result == -2)
+        return 1;  // Too many arguments, do not exit!
+    exit(result);  // Only exit if it was allowed
+    }
+
 
     restore_stdio(saved_stdin, saved_stdout);
     return (exit_code);
@@ -170,23 +179,22 @@ void restore_stdio(int saved_stdin, int saved_stdout)
     }
 }
 
-int check_if_folder(char *cmd)
+int	check_if_folder(char *cmd)
 {
-    struct stat statbuf;
+	struct stat	statbuf;
 
-    if (stat(cmd, &statbuf) == -1)
-    {
-        fprintf(stderr, "%s: No such file or directory\n", cmd);
-        set_last_exit_status(127);
-        return (2);
-    }
-    if (statbuf.st_mode & S_IFDIR)
-    {
-        fprintf(stderr, "%s: Is a directory\n", cmd);
-        set_last_exit_status(126);
-        return (1);
-    }
-    return (0);
+	if (stat(cmd, &statbuf) == -1)
+	{
+		set_last_exit_status(127);
+		return (2);
+	}
+	if (statbuf.st_mode & S_IFDIR)
+	{
+		printf("%s: Is a directory\n", cmd);
+		set_last_exit_status(126);
+		return (1);
+	}
+	return (0);
 }
 
  int  exec_node(t_command *c, t_env *env_list)
@@ -232,7 +240,6 @@ int check_if_folder(char *cmd)
 
 void execute_commands(t_command *cmds, t_env *env_list)
 {
-
     int pipefd[2];
     int prev_fd = -1;
     pid_t pid;
