@@ -12,16 +12,16 @@
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-#include "../libft/libft.h"
-#include "lexer.h"
-#include "parse.h"
-#include "env.h"
-#include "redirection.h"
-#include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/stat.h>
+# include "../libft/libft.h"
+# include "env.h"
+# include "lexer.h"
+# include "parse.h"
+# include "redirection.h"
+# include <ctype.h>
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <stdio.h>
+# include <string.h>
+# include <sys/stat.h>
 
 #endif
