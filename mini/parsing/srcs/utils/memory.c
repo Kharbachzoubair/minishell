@@ -47,3 +47,30 @@ void	free_commands(t_command *head)
 		free(temp);
 	}
 }
+
+void	free_env_list(t_env *head)
+{
+	t_env	*temp;
+
+	while (head)
+	{
+		temp = head;
+		head = head->next;
+		free(temp->key);
+		free(temp->value);
+		free(temp);
+	}
+}
+
+void	free_redirections(t_redirection *head)
+{
+	t_redirection	*temp;
+
+	while (head)
+	{
+		temp = head;
+		head = head->next;
+		free(temp->file);
+		free(temp);
+	}
+}

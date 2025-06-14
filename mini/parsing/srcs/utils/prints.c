@@ -6,12 +6,22 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 17:19:51 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 17:20:18 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 20:35:32 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+void print_env_list(t_env *env_list)
+{
+    t_env *current = env_list;
+    printf("Environment variables:\n");
+    while (current)
+    {
+        printf("%s=%s\n", current->key, current->value);
+        current = current->next;
+    }
+}
 
 void	print_commands(t_command *head)
 {
@@ -45,3 +55,4 @@ void	print_commands(t_command *head)
 		current = current->next;
 	}
 }
+

@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 17:14:35 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 17:15:02 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 20:35:34 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,60 @@ int	update_command_arg(t_command *cmd, int arg_index, char *new_value)
 			return (0);
 	}
 	return (1);
+}
+
+char	*ft_strncpy(char *dest, const char *src, size_t n)
+{
+	size_t	i;
+
+	if (!dest || !src)
+		return (dest);
+	i = 0;
+	while (i < n && src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	while (i < n)
+	{
+		dest[i] = '\0';
+		i++;
+	}
+	return (dest);
+}
+
+char	*ft_strcat(char *dest, const char *src)
+{
+	size_t	dest_len;
+	size_t	i;
+
+	if (!dest || !src)
+		return (dest);
+	dest_len = 0;
+	while (dest[dest_len])
+		dest_len++;
+	i = 0;
+	while (src[i])
+	{
+		dest[dest_len + i] = src[i];
+		i++;
+	}
+	dest[dest_len + i] = '\0';
+	return (dest);
+}
+
+char	*ft_strcpy(char *dest, const char *src)
+{
+	size_t	i;
+
+	if (!dest || !src)
+		return (dest);
+	i = 0;
+	while (src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
 }

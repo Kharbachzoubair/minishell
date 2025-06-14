@@ -12,25 +12,12 @@
 
 #include "../includes/minishell.h"
 
-void print_env_list(t_env *env_list)
-{
-    t_env *current = env_list;
-    printf("Environment variables:\n");
-    while (current)
-    {
-        printf("%s=%s\n", current->key, current->value);
-        current = current->next;
-    }
-}
-
-/* Safely duplicate a string */
 char *safe_strdup(const char *str)
 {
     if (!str)
-        return strdup("");
-    return strdup(str);
+        return ft_strdup("");
+    return ft_strdup(str);
 }
-
 
 char	*extract_and_expand_var(char *var_str, t_env *env_list)
 {
