@@ -1,30 +1,27 @@
-# Compiler and flags
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 
-# Project name
 NAME = minishell
 
-# Directories
 LIBFT_DIR = libft
 OBJ_DIR = objs
 
-# Include paths
+
 INC = -I./parsing/includes -I./execution -I$(LIBFT_DIR)
 
-# Libft
+
 LIBFT = $(LIBFT_DIR)/libft.a
 
-# Readline flags
 READLINE_FLAGS = -lreadline
 
-# Source files - adjust these paths to match your actual file structure
 SRC_FILES = main.c \
 			heredoc.c \
+			parsing/srcs/utils/prints.c \
 			parsing/srcs/lexer/tokenizer.c \
 			parsing/srcs/lexer/token_utils.c \
 			parsing/srcs/lexer/lexer_utils.c \
-			parsing/srcs/parser/parser.c \
+			parsing/srcs/parser/rediraction_util.c \
+			parsing/srcs/parser/helper.c \
 			parsing/srcs/parser/expansions.c \
 			parsing/srcs/parser/expansions_utils.c \
 			parsing/srcs/parser/quotes.c \
@@ -42,23 +39,22 @@ SRC_FILES = main.c \
 			execution/helpers/helpers.c \
 			execution/execute.c
 
-# Object files
+
 OBJ_FILES = $(SRC_FILES:.c=.o)
 OBJS = $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 
-# Rules
+
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(READLINE_FLAGS) -o $(NAME)
 
-# Generic rule for all object files
+
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 $(LIBFT):
-	echo bdina
 	@make -C $(LIBFT_DIR)
 
 clean:
