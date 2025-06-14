@@ -14,15 +14,17 @@
 
 int builtin_env(t_env *env_list)
 {
-    t_env *cur;
+    t_env *cur = env_list;
 
-    cur = env_list;
     while (cur)
     {
-        write(1, cur->key, ft_strlen(cur->key));
-        write(1, "=", 1);
-        write(1, cur->value, ft_strlen(cur->value));
-        write(1, "\n", 1);
+        if (cur->value) // Only print if the variable has a value
+        {
+            write(1, cur->key, ft_strlen(cur->key));
+            write(1, "=", 1);
+            write(1, cur->value, ft_strlen(cur->value));
+            write(1, "\n", 1);
+        }
         cur = cur->next;
     }
     return (0);

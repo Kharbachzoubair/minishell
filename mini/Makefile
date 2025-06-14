@@ -35,6 +35,7 @@ SRC_FILES = main.c \
 			execution/builtins/pwd.c \
 			execution/builtins/echo.c \
 			execution/builtins/env.c \
+			execution/builtins/exit.c \
 			execution/builtins/export.c \
 			execution/builtins/unset.c \
 			execution/builtins/cd.c \

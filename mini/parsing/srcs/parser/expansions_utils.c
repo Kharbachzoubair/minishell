@@ -3,63 +3,53 @@
 /*                                                        :::      ::::::::   */
 /*   expansions_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:33:07 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:28:05 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 08:15:10 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_env	*create_env_var(char *key, char *value)
+t_env *create_env_var(char *key, char *value)
 {
-	t_env	*new_var;
-
-	new_var = malloc(sizeof(t_env));
-	if (!new_var)
+	t_env *new = malloc(sizeof(t_env));
+	if (!new)
 		return (NULL);
-	new_var->key = ft_strdup(key);
-	if (!new_var->key)
-	{
-		free(new_var);
-		return (NULL);
-	}
-	new_var->value = ft_strdup(value);
-	if (!new_var->value)
-	{
-		free(new_var->key);
-		free(new_var);
-		return (NULL);
-	}
-	new_var->next = NULL;
-	return (new_var);
+	new->key = ft_strdup(key);
+	new->value = value ? ft_strdup(value) : NULL;
+	new->next = NULL;
+	return (new);
 }
-void	add_env_var(t_env **head, t_env *new_var)
+void add_env_var(t_env **env_list, t_env *new)
 {
-	t_env	*current;
+	t_env *tmp = *env_list;
 
-	if (!head || !new_var)
-		return ;
-	/* If variable already exists, update its value */
-	current = *head;
-	while (current)
+	while (tmp)
 	{
-		if (strcmp(current->key, new_var->key) == 0)
+		if (strcmp(tmp->key, new->key) == 0)
 		{
-			free(current->value);
-			current->value = strdup(new_var->value);
-			/* Free the new node as we're just updating */
-			free(new_var->key);
-			free(new_var->value);
-			free(new_var);
-			return ;
+			free(tmp->value);
+			tmp->value = ft_strdup(new->value);
+			free(new->key);
+			free(new->value);
+			free(new);
+			return;
 		}
-		current = current->next;
+		tmp = tmp->next;
 	}
-	/* Add to beginning of list for simplicity */
-	new_var->next = *head;
-	*head = new_var;
+
+	// Not found: add to end
+	tmp = *env_list;
+	if (!tmp)
+		*env_list = new;
+	else
+	{
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+	}
 }
 
 void	free_env_list(t_env *head)
