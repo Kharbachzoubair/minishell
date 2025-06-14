@@ -6,29 +6,46 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:32 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:26:53 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/13 16:53:33 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include "lexer.h"
 
-int	handle_operator(char *input, int i, t_token **head, int has_space)
+static void	create_and_add_token(t_token_type type, char *value,
+						t_token **head, int has_space)
 {
 	t_token	*tok;
 
-	if (input[i] == '|')
-		tok = create_token(TOKEN_PIPE, "|", has_space, 0), i++;
-	else if (input[i] == '<' && input[i + 1] == '<')
-		tok = create_token(TOKEN_HEREDOC, "<<", has_space, 0), i += 2;
-	else if (input[i] == '<')
-		tok = create_token(TOKEN_REDIR_IN, "<", has_space, 0), i++;
-	else if (input[i] == '>' && input[i + 1] == '>')
-		tok = create_token(TOKEN_APPEND, ">>", has_space, 0), i += 2;
-	else
-		tok = create_token(TOKEN_REDIR_OUT, ">", has_space, 0), i++;
+	tok = create_token(type, value, has_space, 0);
 	add_token(head, tok);
-	return (i);
+}
+
+int	handle_operator(char *input, int i, t_token **head, int has_space)
+{
+	if (input[i] == '|')
+	{
+		create_and_add_token(TOKEN_PIPE, "|", head, has_space);
+		return (i + 1);
+	}
+	else if (input[i] == '<' && input[i + 1] == '<')
+	{
+		create_and_add_token(TOKEN_HEREDOC, "<<", head, has_space);
+		return (i + 2);
+	}
+	else if (input[i] == '<')
+	{
+		create_and_add_token(TOKEN_REDIR_IN, "<", head, has_space);
+		return (i + 1);
+	}
+	else if (input[i] == '>' && input[i + 1] == '>')
+	{
+		create_and_add_token(TOKEN_APPEND, ">>", head, has_space);
+		return (i + 2);
+	}
+	create_and_add_token(TOKEN_REDIR_OUT, ">", head, has_space);
+	return (i + 1);
 }
 
 int	handle_quotes(char *input, int i, t_token **head, int has_space)

@@ -6,16 +6,14 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:27:05 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:25:26 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/13 17:42:14 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ENV_H
 # define ENV_H
-# include "../libft/libft.h"
 # include "minishell.h"
 
-# include "lexer.h"
 typedef struct s_env
 {
 	char			*key;

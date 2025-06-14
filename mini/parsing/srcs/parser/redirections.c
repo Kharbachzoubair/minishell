@@ -6,13 +6,12 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:40:02 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:28:18 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/13 17:03:37 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-// Create a new redirection
 t_redirection *create_redirection(t_token_type type, char *file)
 {
     t_redirection *redir = malloc(sizeof(t_redirection));
@@ -32,7 +31,7 @@ t_redirection *create_redirection(t_token_type type, char *file)
     return redir;
 }
 
-// Add a redirection to the command's list
+
 void add_redirection(t_command *cmd, t_redirection *new_redir)
 {
     t_redirection *current;

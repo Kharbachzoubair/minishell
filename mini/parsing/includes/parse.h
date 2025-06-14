@@ -13,9 +13,7 @@
 
 #ifndef PARSE_H
 # define PARSE_H
-# include "../libft/libft.h"
 # include "minishell.h"
-# include "redirection.h"
 # define MAX_HEREDOCS 16
 
 typedef struct s_redirection
@@ -49,7 +47,6 @@ int							add_argument(t_command *cmd, char *arg);
 void						set_redirection(t_command *cmd, t_token *type_token,
 								t_token *file_token);
 void						free_commands(t_command *head);
-void						print_commands(t_command *head);
 int							check_quote_closure(char *input);
 int							process_single_quotes(char *input, int i,
 								t_token **head, int has_space);
@@ -60,4 +57,6 @@ void						add_redirection(t_command *cmd,
 								t_redirection *new_redir);
 void						free_redirections(t_redirection *head);
 t_redirection				*create_redirection(t_token_type type, char *file);
+int							update_command_arg(t_command *cmd, int arg_index, char *new_value);
+char						*merge_token_values(const char *first, const char *second);
 #endif
