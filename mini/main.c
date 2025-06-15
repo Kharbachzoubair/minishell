@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 16:12:16 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 20:33:40 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 15:40:06 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static int	count_env_vars(t_env *env_list)
 		cur = cur->next;
 	}
 	return (count);
-}
+} 
 
 static void	cleanup_envp_on_error(char **envp, int i)
 {

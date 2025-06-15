@@ -1,49 +1,37 @@
-# Compiler
-CC = gcc
+CC = cc
 
-# Compiler Flags
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -Werror
 
-# Directories
-SRC_DIR = .
-BUILD_DIR = build
-OBJ_DIR = $(BUILD_DIR)/obj
-BIN_DIR = $(BUILD_DIR)/bin
+NAME = exec.a
 
-# Source Files
-SRCS = main.c \
-       builtins/builtin_pwd.c \
-       builtins/builtin_echo.c \
-       builtins/builtin_env.c \
-       builtins/builtin_export.c \
-       builtins/builtin_unset.c \
-       builtins/builtin_cd.c \
-       external/external.c \
-       helpers/helpers.c
+AR = ar
 
-# Object Files
-OBJS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(notdir $(SRCS)))
+SRCS = builtins/pwd.c \
+	builtins/echo.c \
+	builtins/env.c \
+	builtins/exit.c \
+	builtins/export.c \
+	builtins/unset.c \
+	builtins/cd.c \
+	external/external.c \
+	helpers/helpers.c \
+	execute.c \
 
-# Executable Name
-TARGET = $(BIN_DIR)/shell
+OBJS = ${SRCS:.c=.o}
 
-# Default Target
-all: $(TARGET)
+%o : %c shell.h
+	${CC} -o $@ ${CFLAGS} -c $<
 
-# Create Directories
-$(OBJ_DIR) $(BIN_DIR):
-	mkdir -p $@
+all : ${NAME}
 
-# Linking the Executable
-$(TARGET): $(OBJS) | $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+${NAME} : ${OBJS}
+	${AR} rcs ${NAME} ${OBJS}
 
-# Compile Source Files into Object Files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean Up Build Files
-clean:
-	rm -rf $(BUILD_DIR)
+clean :
+	rm -rf ${OBJS} ${BOBJS}
 
-.PHONY: all clean
+fclean : clean
+	rm -rf ${NAME}
+
+re : fclean all

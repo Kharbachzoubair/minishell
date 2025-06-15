@@ -7,6 +7,8 @@ NAME = minishell
 
 # Directories
 LIBFT_DIR = libft
+EXEC_DIR = execution
+
 OBJ_DIR = objs
 
 # Include paths
@@ -14,6 +16,7 @@ INC = -I./parsing/includes -I./execution -I$(LIBFT_DIR)
 
 # Libft
 LIBFT = $(LIBFT_DIR)/libft.a
+EXEC = $(EXEC_DIR)/exec.a
 
 # Readline flags
 READLINE_FLAGS = -lreadline
@@ -38,17 +41,7 @@ SRC_FILES = main.c \
 			parsing/srcs/redirection/rediraction_util.c \
 			parsing/srcs/redirection/redirection_handler.c \
 			parsing/srcs/utils/error.c \
-			parsing/srcs/utils/memory.c \
-			execution/builtins/pwd.c \
-			execution/builtins/echo.c \
-			execution/builtins/env.c \
-			execution/builtins/exit.c \
-			execution/builtins/export.c \
-			execution/builtins/unset.c \
-			execution/builtins/cd.c \
-			execution/external/external.c \
-			execution/helpers/helpers.c \
-			execution/execute.c
+			parsing/srcs/utils/memory.c 
 
 # Object files
 OBJ_FILES = $(SRC_FILES:.c=.o)
@@ -57,8 +50,11 @@ OBJS = $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 # Rules
 all: $(NAME)
 
-$(NAME): $(LIBFT) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(READLINE_FLAGS) -o $(NAME)
+$(NAME): $(OBJS)
+	echo hey
+	make -C $(LIBFT_DIR)
+	make -C $(EXEC_DIR)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(EXEC) $(READLINE_FLAGS) -o $(NAME)
 
 # Generic rule for all object files
 $(OBJ_DIR)/%.o: %.c
@@ -66,15 +62,19 @@ $(OBJ_DIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 $(LIBFT):
-	echo bdina
-	@make -C $(LIBFT_DIR)
+	make -C $(LIBFT_DIR)
+
+$(EXEC):
+	make -C $(EXEC_DIR)
 
 clean:
 	@make -C $(LIBFT_DIR) clean
+	@make -C $(EXEC_DIR) clean
 	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	@make -C $(LIBFT_DIR) fclean
+	@make -C $(EXEC_DIR) fclean
 	rm -f $(NAME)
 
 re: fclean all

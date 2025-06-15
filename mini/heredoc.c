@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 15:00:00 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 20:30:44 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 15:52:55 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int create_heredoc_tmpfile(const char *content)
     if (write(fd, content, strlen(content)) == -1)
     {
         close(fd);
-        return (-1);
+        return (-1);  
     }
 
     lseek(fd, 0, SEEK_SET);

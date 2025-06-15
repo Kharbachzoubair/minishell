@@ -6,14 +6,14 @@
 /*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 19:27:26 by zkharbac          #+#    #+#             */
-/*   Updated: 2025/06/13 16:30:14 by zkharbac         ###   ########.fr       */
+/*   Updated: 2025/06/15 15:32:49 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "shell.h"
+#include "../shell.h"
 
 static int is_numeric(const char *str)
 {

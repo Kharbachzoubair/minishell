@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/env.h"
+#include "../shell.h"
 
 int builtin_env(t_env *env_list)
 {

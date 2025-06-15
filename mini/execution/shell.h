@@ -12,7 +12,7 @@
 
 #ifndef SHELL_H
 # define SHELL_H
-# include "../libft/libft.h"
+// # include "../libft/libft.h"//
 # include "../parsing/includes/minishell.h"
 #include <limits.h>
 void restore_stdio(int saved_stdin, int saved_stdout);
