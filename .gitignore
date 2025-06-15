@@ -2,3 +2,4 @@
 parsing/objs/
 *.txt
 *.a
+.vscode/

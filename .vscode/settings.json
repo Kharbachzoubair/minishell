@@ -1,12 +1,13 @@
 {
-	"files.associations": {
-		"shell.h": "c",
-		"stdlib.h": "c",
-		"parse.h": "c",
-		"minishell.h": "c",
-		"ctype.h": "c",
-		"env.h": "c",
-		"libft.h": "c",
-		"fcntl.h": "c"
-	}
+  "files.associations": {
+    "shell.h": "c",
+    "stdlib.h": "c",
+    "parse.h": "c",
+    "minishell.h": "c",
+    "ctype.h": "c",
+    "env.h": "c",
+    "libft.h": "c",
+    "fcntl.h": "c"
+  },
+  "C_Cpp_Runner.msvcBatchPath": ""
 }
