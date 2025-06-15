@@ -24,12 +24,13 @@ SRC_FILES = main.c \
 			parsing/srcs/lexer/tokenizer.c \
 			parsing/srcs/lexer/token_utils.c \
 			parsing/srcs/lexer/lexer_utils.c \
-			parsing/srcs/parser/parser.c \
 			parsing/srcs/parser/expansions.c \
 			parsing/srcs/parser/expansions_utils.c \
 			parsing/srcs/parser/quotes.c \
 			parsing/srcs/parser/redirections.c \
+			parsing/srcs/parser/rediraction_util.c \
 			parsing/srcs/parser/command_utils.c \
+			parsing/srcs/parser/helper.c \
 			parsing/srcs/utils/error.c \
 			parsing/srcs/utils/memory.c \
 			execution/builtins/pwd.c \

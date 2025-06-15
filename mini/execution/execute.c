@@ -32,6 +32,11 @@ int is_builtin(char *cmd)
         strcmp(cmd, "env") == 0 || strcmp(cmd, "exit") == 0);
 }
 
+void restore_stdio(int saved_stdin, int saved_stdout)
+{
+    if (saved_stdin != -1) { dup2(saved_stdin, STDIN_FILENO); close(saved_stdin); }
+    if (saved_stdout != -1) { dup2(saved_stdout, STDOUT_FILENO); close(saved_stdout); }
+}
 int exec_builtin(t_command *c, t_env *env_list)
 {
     int exit_code = 1;
@@ -132,11 +137,6 @@ void apply_redirs(t_command *cmd, int *saved_stdin, int *saved_stdout)
     }
 }
 
-void restore_stdio(int saved_stdin, int saved_stdout)
-{
-    if (saved_stdin != -1) { dup2(saved_stdin, STDIN_FILENO); close(saved_stdin); }
-    if (saved_stdout != -1) { dup2(saved_stdout, STDOUT_FILENO); close(saved_stdout); }
-}
 
 int check_if_folder(char *cmd)
 {
