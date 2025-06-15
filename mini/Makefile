@@ -50,10 +50,7 @@ OBJS = $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 # Rules
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	echo hey
-	make -C $(LIBFT_DIR)
-	make -C $(EXEC_DIR)
+$(NAME): $(LIBFT) $(EXEC) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(EXEC) $(READLINE_FLAGS) -o $(NAME)
 
 # Generic rule for all object files

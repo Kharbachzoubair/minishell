@@ -19,7 +19,7 @@ SRCS = builtins/pwd.c \
 
 OBJS = ${SRCS:.c=.o}
 
-%o : %c shell.h
+%.o : %.c shell.h
 	${CC} -o $@ ${CFLAGS} -c $<
 
 all : ${NAME}

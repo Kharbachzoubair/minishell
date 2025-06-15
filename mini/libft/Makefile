@@ -23,7 +23,7 @@ OBJS = ${SRCS:.c=.o}
 
 BOBJS= ${BSRCS:.c=.o}
 
-%o : %c libft.h
+%.o : %.c libft.h
 	${CC} -o $@ ${CFLAGS} -c $<
 
 all : ${NAME}
