@@ -39,7 +39,10 @@ typedef struct s_command
 	int						type;
 	struct s_command		*next;
 }							t_command;
-
+int							check_pipe_syntax(t_command *current, t_token *tok);
+void						finalize_current_command(t_command **head, t_command **current);
+t_token						*process_single_token(t_command **current, t_command **head,
+								t_token *tok);
 t_command					*parse_tokens(t_token *tokens);
 t_command					*create_command(void);
 void						add_command(t_command **head, t_command *new_cmd);
@@ -59,4 +62,6 @@ void						free_redirections(t_redirection *head);
 t_redirection				*create_redirection(t_token_type type, char *file);
 int							update_command_arg(t_command *cmd, int arg_index, char *new_value);
 char						*merge_token_values(const char *first, const char *second);
+t_command					*handle_word_token(t_command *current, t_token *tok);
+int							handle_token_merging(t_command *current, t_token *tok);
 #endif

@@ -6,63 +6,57 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:33:07 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 20:31:18 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 20:47:42 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-t_env	*create_env_var(char *key, char *value)
+static char	*extract_env_key(char *env_line, char *eq_pos)
 {
-	t_env	*new;
+	char	*key;
+	int		key_len;
 
-	new = malloc(sizeof(t_env));
-	if (!new)
+	key_len = eq_pos - env_line;
+	key = malloc(key_len + 1);
+	if (!key)
 		return (NULL);
-	new->key = ft_strdup(key);
-	new->value = value ? ft_strdup(value) : NULL;
-	new->next = NULL;
-	return (new);
+	ft_strncpy(key, env_line, key_len);
+	key[key_len] = '\0';
+	return (key);
 }
 
-void	add_env_var(t_env **env_list, t_env *new)
+static int	process_env_line(char *env_line, t_env **env_list)
 {
-	t_env	*tmp;
+	char	*eq_pos;
+	char	*key;
+	char	*value;
+	t_env	*new_var;
 
-	tmp = *env_list;
-	while (tmp)
+	eq_pos = ft_strchr(env_line, '=');
+	if (!eq_pos)
+		return (1);
+	key = extract_env_key(env_line, eq_pos);
+	if (!key)
+		return (1);
+	value = ft_strdup(eq_pos + 1);
+	if (!value)
 	{
-		if (strcmp(tmp->key, new->key) == 0)
-		{
-			free(tmp->value);
-			tmp->value = ft_strdup(new->value);
-			free(new->key);
-			free(new->value);
-			free(new);
-			return ;
-		}
-		tmp = tmp->next;
+		free(key);
+		return (1);
 	}
-	tmp = *env_list;
-	if (!tmp)
-		*env_list = new;
-	else
-	{
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = new;
-	}
+	new_var = create_env_var(key, value);
+	if (new_var)
+		add_env_var(env_list, new_var);
+	free(key);
+	free(value);
+	return (1);
 }
 
 t_env	*init_env(char **environ)
 {
 	t_env	*env_list;
 	int		i;
-	char	*eq_pos;
-	int		key_len;
-	char	*key;
-	char	*value;
-	t_env	*new_var;
 
 	env_list = NULL;
 	if (!environ)
@@ -70,47 +64,12 @@ t_env	*init_env(char **environ)
 	i = 0;
 	while (environ[i])
 	{
-		eq_pos = strchr(environ[i], '=');
-		if (eq_pos)
-		{
-			key_len = eq_pos - environ[i];
-			key = malloc(key_len + 1);
-			if (!key)
-				continue ;
-			ft_strncpy(key, environ[i], key_len);
-			key[key_len] = '\0';
-			value = strdup(eq_pos + 1);
-			if (!value)
-			{
-				free(key);
-				continue ;
-			}
-			new_var = create_env_var(key, value);
-			if (new_var)
-				add_env_var(&env_list, new_var);
-			free(key);
-			free(value);
-		}
+		process_env_line(environ[i], &env_list);
 		i++;
 	}
 	return (env_list);
 }
 
-char	*get_env_value(t_env *env_list, char *key)
-{
-	t_env	*current;
-
-	current = env_list;
-	if (!key || !*key || !env_list)
-		return (ft_strdup(""));
-	while (current)
-	{
-		if (strcmp(current->key, key) == 0)
-			return (ft_strdup(current->value));
-		current = current->next;
-	}
-	return (ft_strdup(""));
-}
 void	expand_env_variables_improved(t_token *tokens, t_env *env_list,
 		int last_exit_status)
 {

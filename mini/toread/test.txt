@@ -1,0 +1,18 @@
+working
+t_token	*process_single_token(t_command **current, t_command **head,
+					t_token *tok) = normineet in command command.c
+					strncpy
+					strcat
+	**everything related to expansion is need a second eye **
+
+
+unset SECURITYSESSIONID USER MallocNanoZone COMMAND_MODE PATH HOME SHELL LaunchInstanceID __CF_USER_TEXT_ENCODING XPC_SERVICE_NAME SSH_AUTH_SOCK XPC_FLAGS LOGNAME TMPDIR ORIGINAL_XDG_CURRENT_DESKTOP SHLVL PWD OLDPWD ZSH PAGER LESS LSCOLORS LS_COLORS NVM_DIR NVM_CD_FLAGS TERM_PROGRAM TERM_PROGRAM_VERSION LANG COLORTERM GIT_ASKPASS VSCODE_GIT_ASKPASS_NODE VSCODE_GIT_ASKPASS_EXTRA_ARGS VSCODE_GIT_ASKPASS_MAIN VSCODE_GIT_IPC_HANDLE VSCODE_INJECTION ZDOTDIR USER_ZDOTDIR TERM _
+minishell> env
+[1]    15794 segmentation fault  ./minishell
+
+
+git to read :
+git stash
+git pull origin from the branch
+git stash pop
+
