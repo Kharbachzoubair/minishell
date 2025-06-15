@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 12:33:07 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 20:47:42 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 17:33:49 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,11 +105,10 @@ char	*replace_substring_2(char *str, int start, int end, char *replacement)
 	prefix_len = start;
 	new_str = malloc(prefix_len + strlen(replacement) + strlen(str + end) + 1);
 	if (!new_str)
-		return (str);
+		return (NULL);
 	ft_strncpy(new_str, str, start);
 	new_str[start] = '\0';
 	ft_strcat(new_str, replacement);
 	ft_strcat(new_str, str + end);
-	free(str);
 	return (new_str);
 }

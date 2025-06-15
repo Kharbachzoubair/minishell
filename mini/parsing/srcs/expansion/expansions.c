@@ -12,22 +12,22 @@
 
 #include "../includes/minishell.h"
 
-static char	*handle_exit_status_expansion(char **result, int offset,
+static int	handle_exit_status_expansion(char **result, int offset,
 				int last_exit_status)
 {
-	char	*exit_str;
+	char	*status_str;
 	char	*new_result;
 
-	exit_str = ft_itoa(last_exit_status);
-	if (!exit_str)
-		return (NULL);
-	new_result = replace_substring_2(*result, offset, offset + 2, exit_str);
-	free(exit_str);
+	status_str = ft_itoa(last_exit_status);
+	if (!status_str)
+		return (0);
+	new_result = replace_substring_2(*result, offset, offset + 2, status_str);
+	free(status_str);
 	if (!new_result)
-		return (NULL);
+		return (0);
 	free(*result);
 	*result = new_result;
-	return (new_result);
+	return (1);
 }
 
 static int	get_var_name_length(char *start)
@@ -40,7 +40,8 @@ static int	get_var_name_length(char *start)
 	return (p - start);
 }
 
-static char	*handle_variable_expansion(char **result, int offset,
+
+static int	handle_variable_expansion(char **result, int offset,
 				char *dollar, t_env *env_list)
 {
 	int		var_len;
@@ -50,27 +51,27 @@ static char	*handle_variable_expansion(char **result, int offset,
 
 	var_len = get_var_name_length(dollar + 1);
 	if (var_len == 0)
-		return (*result);
+		return (1);
 	var = ft_strndup(dollar + 1, var_len);
 	if (!var)
-		return (NULL);
+		return (0);
 	val = get_env_value(env_list, var);
 	free(var);
 	if (!val)
 		val = ft_strdup("");
 	if (!val)
-		return (NULL);
+		return (0);
 	new_result = replace_substring_2(*result, offset, offset + 1 + var_len,
 			val);
 	free(val);
 	if (!new_result)
-		return (NULL);
+		return (0);
 	free(*result);
 	*result = new_result;
-	return (new_result);
+	return (1);
 }
 
-static char	*process_expansion(char **result, char *dollar, t_env *env_list,
+static int	process_expansion(char **result, char *dollar, t_env *env_list,
 				int last_exit_status)
 {
 	int	offset;
@@ -82,6 +83,7 @@ static char	*process_expansion(char **result, char *dollar, t_env *env_list,
 	else
 		return (handle_variable_expansion(result, offset, dollar, env_list));
 }
+
 
 char	*expand_env_in_string(char *str, t_env *env_list, int last_exit_status)
 {
