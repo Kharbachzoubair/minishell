@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 18:05:20 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 18:34:53 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 12:52:39 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,23 @@ void	finalize_current_command(t_command **head, t_command **current)
 		free(*current);
 }
 
+static t_token	*handle_redirection_types(t_command **current, t_token *tok)
+{
+	if (tok->type >= TOKEN_REDIR_IN && tok->type <= TOKEN_APPEND)
+	{
+		tok = handle_redirection_token(current, tok);
+		if (!tok)
+			return (NULL);
+	}
+	else if (tok->type == TOKEN_HEREDOC)
+	{
+		tok = handle_heredoc_token(current, tok);
+		if (!tok)
+			return (NULL);
+	}
+	return (tok);
+}
+
 t_token	*process_single_token(t_command **current, t_command **head,
 					t_token *tok)
 {
@@ -54,18 +71,8 @@ t_token	*process_single_token(t_command **current, t_command **head,
 		add_command(head, *current);
 		*current = NULL;
 	}
-	else if (tok->type >= TOKEN_REDIR_IN && tok->type <= TOKEN_APPEND)
-	{
-		tok = handle_redirection_token(current, tok);
-		if (!tok)
-			return (NULL);
-	}
-	else if (tok->type == TOKEN_HEREDOC)
-	{
-		tok = handle_heredoc_token(current, tok);
-		if (!tok)
-			return (NULL);
-	}
+	else
+		return (handle_redirection_types(current, tok));
 	return (tok);
 }
 

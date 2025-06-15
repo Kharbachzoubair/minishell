@@ -6,44 +6,65 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:40:09 by absaadan          #+#    #+#             */
-/*   Updated: 2025/05/06 09:57:32 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 12:47:16 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+static void	free_heredoc_delims(char **heredoc_delims, int heredoc_count)
+{
+	int	i;
+
+	if (!heredoc_delims)
+		return ;
+	i = 0;
+	while (i < heredoc_count)
+	{
+		free(heredoc_delims[i]);
+		i++;
+	}
+	free(heredoc_delims);
+}
+
+static void	free_command_args(t_command *cmd)
+{
+	int	i;
+
+	if (!cmd->args)
+		return ;
+	i = 0;
+	while (i < cmd->arg_count)
+	{
+		free(cmd->args[i]);
+		i++;
+	}
+	free(cmd->args);
+}
+
+static void	free_command_data(t_command *cmd)
+{
+	if (cmd->name)
+		free(cmd->name);
+	free_command_args(cmd);
+	free_redirections(cmd->redirections);
+	if (cmd->input_file)
+		free(cmd->input_file);
+	if (cmd->output_file)
+		free(cmd->output_file);
+	if (cmd->heredoc_delims)
+		free_heredoc_delims(cmd->heredoc_delims, cmd->heredoc_count);
+}
+
 void	free_commands(t_command *head)
 {
 	t_command	*temp;
-	int			i;
 
 	while (head)
 	{
 		temp = head;
 		head = head->next;
-		if (temp->name)
-			free(temp->name);
-		if (temp->args)
-		{
-			i = 0;
-			while (i < temp->arg_count)
-			{
-				free(temp->args[i]);
-				i++;
-			}
-			free(temp->args);
-		}
-		free_redirections(temp->redirections);
-		if (temp->input_file)
-			free(temp->input_file);
-		if (temp->output_file)
-			free(temp->output_file);
-		if (temp->heredoc_delims)
-		{
-			for (int i = 0; i < temp->heredoc_count; i++)
-				free(temp->heredoc_delims[i]);
-			free(temp->heredoc_delims);
-		}
+		free_command_data(temp);
 		free(temp);
 	}
 }
@@ -58,19 +79,6 @@ void	free_env_list(t_env *head)
 		head = head->next;
 		free(temp->key);
 		free(temp->value);
-		free(temp);
-	}
-}
-
-void	free_redirections(t_redirection *head)
-{
-	t_redirection	*temp;
-
-	while (head)
-	{
-		temp = head;
-		head = head->next;
-		free(temp->file);
 		free(temp);
 	}
 }

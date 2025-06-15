@@ -51,8 +51,7 @@ t_token	*handle_redirection_token(t_command **current, t_token *tok)
 		set_redirection(*current, tok, tok->next);
 		return (tok->next);
 	}
-	fprintf(stderr,
-		"minishell: syntax error near unexpected token `%s`\n",
+	fprintf(stderr, "minishell: syntax error near unexpected token `%s`\n",
 		get_redirection_error_token(tok));
 	return (NULL);
 }

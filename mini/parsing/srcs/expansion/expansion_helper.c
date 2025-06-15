@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 20:44:17 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 21:01:25 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 12:38:22 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,10 @@ t_env	*create_env_var(char *key, char *value)
 	if (!new)
 		return (NULL);
 	new->key = ft_strdup(key);
-	new->value = value ? ft_strdup(value) : NULL;
+	if (value)
+		new->value = ft_strdup(value);
+	else
+		new->value = NULL;
 	new->next = NULL;
 	return (new);
 }

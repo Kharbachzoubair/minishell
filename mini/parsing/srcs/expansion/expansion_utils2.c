@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/14 20:49:10 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/14 20:51:32 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 12:35:09 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ char	*extract_and_expand_var(char *var_str, t_env *env_list)
 	int		name_len;
 
 	name_len = 0;
-	while (var_str[name_len] && ((var_str[name_len] >= 'a' && var_str[name_len] <= 'z') ||
-		(var_str[name_len] >= 'A' && var_str[name_len] <= 'Z') ||
-		(var_str[name_len] >= '0' && var_str[name_len] <= '9') ||
-		var_str[name_len] == '_'))
+	while (var_str[name_len] && ((var_str[name_len] >= 'a'
+				&& var_str[name_len] <= 'z') || (var_str[name_len] >= 'A'
+				&& var_str[name_len] <= 'Z') || (var_str[name_len] >= '0'
+				&& var_str[name_len] <= '9') || var_str[name_len] == '_'))
 		name_len++;
 	var_name = malloc(name_len + 1);
 	if (!var_name)
@@ -58,10 +58,8 @@ char	*replace_env_var(char *str, char *dollar, char *pos, t_env *env_list)
 	int		name_len;
 
 	var_start = pos;
-	while (*pos && ((*pos >= 'a' && *pos <= 'z') ||
-			(*pos >= 'A' && *pos <= 'Z') ||
-			(*pos >= '0' && *pos <= '9') ||
-			*pos == '_'))
+	while (*pos && ((*pos >= 'a' && *pos <= 'z') || (*pos >= 'A' && *pos <= 'Z')
+			|| (*pos >= '0' && *pos <= '9') || *pos == '_'))
 		pos++;
 	if (var_start == pos)
 		return (str);
@@ -85,8 +83,21 @@ char	*replace_substring(char *str, char *start, char *end, char *replacement)
 		return (str);
 	ft_strlcpy(new_str, str, prefix_len + 1);
 	ft_strlcat(new_str, replacement, prefix_len + ft_strlen(replacement) + 1);
-	ft_strlcat(new_str, end, prefix_len + ft_strlen(replacement) +
-		ft_strlen(end) + 1);
+	ft_strlcat(new_str, end, prefix_len + ft_strlen(replacement)
+		+ ft_strlen(end) + 1);
 	free(str);
+	return (new_str);
+}
+
+char	*replace_exit_status(char *str, char *dollar, char *pos, int exit_code)
+{
+	char	*exit_str;
+	char	*new_str;
+
+	exit_str = ft_itoa(exit_code);
+	if (!exit_str)
+		return (str);
+	new_str = replace_substring(str, dollar, pos + 1, exit_str);
+	free(exit_str);
 	return (new_str);
 }
