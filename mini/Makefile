@@ -1,7 +1,6 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
-
-
+#mine
 NAME = minishell
 
 
@@ -28,6 +27,7 @@ SRC_FILES = main.c \
 			parsing/srcs/expansion/expansion_utils2.c \
 			parsing/srcs/expansion/expansion_helper.c \
 			parsing/srcs/parser/helper.c \
+			parsing/srcs/parser/helper2.c \
 			parsing/srcs/parser/quotes.c \
 			parsing/srcs/commands/command_utils.c \
 			parsing/srcs/commands/command.c \
