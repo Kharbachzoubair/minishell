@@ -12,30 +12,30 @@
 
 #include "../shell.h"
 
-int builtin_unset(char *key, t_env *env_list)
+int	builtin_unset(char *key, t_env **env_list)
 {
-    t_env *cur;
-    t_env *prev;
+	t_env	*cur;
+	t_env	*prev;
 
-    if (!key || !*key)
-        return (1);
-    cur = env_list;
-    prev = NULL;
-    while (cur)
-    {
-        if (strcmp(cur->key, key) == 0)
-        {
-            if (prev)
-                prev->next = cur->next;
-            else
-                env_list = cur->next;
-            free(cur->key);
-            free(cur->value);
-            free(cur);
-            break;
-        }
-        prev = cur;
-        cur = cur->next;
-    }
-    return (0);
+	if (!key || !*key || !env_list)
+		return (1);
+	cur = *env_list;
+	prev = NULL;
+	while (cur)
+	{
+		if (strcmp(cur->key, key) == 0)
+		{
+			if (prev)
+				prev->next = cur->next;
+			else
+				*env_list = cur->next;
+			free(cur->key);
+			free(cur->value);
+			free(cur);
+			return (0);
+		}
+		prev = cur;
+		cur = cur->next;
+	}
+	return (0);
 }

@@ -41,7 +41,8 @@ SRC_FILES = main.c \
 			parsing/srcs/redirection/rediraction_util.c \
 			parsing/srcs/redirection/redirection_handler.c \
 			parsing/srcs/utils/error.c \
-			parsing/srcs/utils/memory.c 
+			parsing/srcs/utils/prints.c \
+			parsing/srcs/utils/memory.c
 
 # Object files
 OBJ_FILES = $(SRC_FILES:.c=.o)

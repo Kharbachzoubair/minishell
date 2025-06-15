@@ -34,7 +34,7 @@ int     builtin_echo(char **args);
 int     builtin_cd(char *path, t_env *env_list);
 int     builtin_pwd(void);
 int builtin_export(char *arg, t_env **env_list);
-int     builtin_unset(char *var, t_env *env_list);
+int     builtin_unset(char *var, t_env **env_list);
 int     builtin_env(t_env *env_list);
 int builtin_exit(char **args);
 int read_and_create_heredoc(char *delimiter);

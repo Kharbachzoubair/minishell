@@ -53,7 +53,7 @@ int exec_builtin(t_command *c, t_env *env_list)
     else if (strcmp(c->name, "export") == 0)
         exit_code = builtin_export(c->args[1], &env_list);
     else if (strcmp(c->name, "unset") == 0)
-        exit_code = builtin_unset(c->args[1], env_list);
+        exit_code = builtin_unset(c->args[1], &env_list);
     else if (strcmp(c->name, "env") == 0)
         exit_code = builtin_env(env_list);
     else if (strcmp(c->name, "exit") == 0)
@@ -153,18 +153,18 @@ int exec_node(t_command *c, t_env *env_list)
     char **envp = env_list_to_envp(env_list);
     pid = fork();
     if (pid == 0)
-    { 
+    {
         int saved_stdin, saved_stdout;
         apply_redirs(c, &saved_stdin, &saved_stdout);
         char *path = strchr(c->name, '/') ? c->name : find_executable(c->name, env_list);
         if (!path) { fprintf(stderr, "%s: command not found\n", c->name); exit(127); }
         if (check_if_folder(path)) { free(path); exit(126); }
         execve(path, c->args, envp);
-        perror(path); exit(EXIT_FAILURE); 
+        perror(path); exit(EXIT_FAILURE);
     }
     waitpid(pid, &status, 0);
     ft_free_strarr(envp);
-    if (WIFEXITED(status)) return WEXITSTATUS(status); 
+    if (WIFEXITED(status)) return WEXITSTATUS(status);
     return 1;
 }
 
