@@ -15,6 +15,7 @@
 # include "../libft/libft.h"
 # include "../parsing/includes/minishell.h"
 #include <limits.h>
+void restore_stdio(int saved_stdin, int saved_stdout);
 
 /* Setter and getter for the global last-exit status */
 void    set_last_exit_status(int status);

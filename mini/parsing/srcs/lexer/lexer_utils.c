@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:32 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:53:33 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 20:30:08 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	handle_word(char *input, int i, t_token **head, int has_space)
 	value = malloc(j - start + 1);
 	if (!value)
 		return (j);
-	strncpy(value, input + start, j - start);
+	ft_strncpy(value, input + start, j - start);
 	value[j - start] = '\0';
 	add_token(head, create_token(TOKEN_WORD, value, has_space, 0));
 	free(value);

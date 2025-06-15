@@ -1,4 +1,4 @@
 *.o
 parsing/objs/
 *.txt
-.vscode/
+*.a

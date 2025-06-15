@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 15:00:00 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:25:10 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 20:30:44 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,8 @@ char *read_heredoc_content_working(const char *delimiter, t_env *env_list)
             content = new_content;
         }
 
-        strcat(content, expanded_line);
-        strcat(content, "\n");
+        ft_strcat(content, expanded_line);
+        ft_strcat(content, "\n");
         length += line_len;
 
         free(expanded_line);

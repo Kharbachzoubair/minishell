@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 09:31:45 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 17:42:25 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 12:42:15 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,5 +15,11 @@
 # include "minishell.h"
 
 void	print_commands(t_command *head);
-
+int		check_redirection_conflict(t_command *current, t_token *tok);
+t_token	*handle_redirection_token(t_command **current, t_token *tok);
+t_token	*handle_heredoc_token(t_command **current, t_token *tok);
+char	*ft_strcat(char *dest, const char *src);
+char	*ft_strncpy(char *dest, const char *src, size_t n);
+char	*ft_strcpy(char *dest, const char *src);
+char	*ft_strndup(const char *s, size_t n);
 #endif

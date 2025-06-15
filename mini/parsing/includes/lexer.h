@@ -1,4 +1,3 @@
-
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -7,12 +6,13 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 15:39:14 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 13:27:10 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/15 12:59:36 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEXER_H
 # define LEXER_H
+
 typedef enum e_token_type
 {
 	TOKEN_WORD,
@@ -38,8 +38,11 @@ t_token				*create_token(t_token_type type, char *value, int has_space,
 						int no_expand);
 void				add_token(t_token **head, t_token *new_token);
 void				free_tokens(t_token *head);
-int	handle_operator(char *input, int i, t_token **head, int has_space);
+int					handle_operator(char *input, int i, t_token **head,
+						int has_space);
 void				print_tokens(t_token *head);
-int	handle_word(char *input, int i, t_token **head, int has_space);
-int	handle_quotes(char *input, int i, t_token **head, int has_space);
+int					handle_word(char *input, int i, t_token **head,
+						int has_space);
+int					handle_quotes(char *input, int i, t_token **head,
+						int has_space);
 #endif

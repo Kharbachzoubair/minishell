@@ -10,3 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes/minishell.h"
+
+void	free_redirections(t_redirection *head)
+{
+	t_redirection	*temp;
+
+	while (head)
+	{
+		temp = head;
+		head = head->next;
+		free(temp->file);
+		free(temp);
+	}
+}

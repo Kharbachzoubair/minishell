@@ -6,7 +6,7 @@
 /*   By: absaadan <absaadan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 16:12:16 by absaadan          #+#    #+#             */
-/*   Updated: 2025/06/13 16:25:55 by absaadan         ###   ########.fr       */
+/*   Updated: 2025/06/14 20:33:40 by absaadan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@ static int	create_env_string(char **envp, int i, t_env *cur)
 	envp[i] = malloc(strlen(cur->key) + 1 + strlen(cur->value) + 1);
 	if (!envp[i])
 		return (0);
-	strcpy(envp[i], cur->key);
-	strcat(envp[i], "=");
-	strcat(envp[i], cur->value);
+	ft_strcpy(envp[i], cur->key);
+	ft_strcat(envp[i], "=");
+	ft_strcat(envp[i], cur->value);
 	return (1);
 }
 

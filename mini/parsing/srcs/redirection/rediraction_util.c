@@ -82,5 +82,3 @@ void	set_redirection(t_command *cmd, t_token *type_token,
 		cmd->heredoc_count++;
 	}
 }
-
-
